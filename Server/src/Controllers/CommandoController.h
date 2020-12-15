@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <vector>
+
 
 namespace
 	Controllers {
@@ -7,19 +9,21 @@ namespace
 	class CommandoController {
 
 	private:
-		std::string _response;
+		std::vector<std::string> _response;
 
 	public:
 		CommandoController();
 
-		std::string runCommand(const std::string& command);
-		std::string info();
-		std::string dir();
-		std::string get();
-		std::string put();
-		std::string ren();
-		std::string del();
-		std::string mkdir();
-		std::string quit();
+		void runCommand(const std::string& command);
+		void info();
+		void dir();
+		void get();
+		void put();
+		void ren();
+		void del();
+		void mkdir();
+		void quit();
+
+		std::vector<std::string> get_response();
 	};
 }

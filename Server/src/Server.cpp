@@ -38,8 +38,17 @@ int main() {
 					break;
 				}
 				else {
-					client << commandoController->runCommand(request) << crlf;
-					client << request << crlf; // simply echo the request
+					//fills response list
+					commandoController->runCommand(request);
+					//gets response list
+					std::vector<std::string> responseList = commandoController->get_response();
+					//loops through response list
+					std::string reponse = {};
+					for (std::string line : responseList)
+					{
+						reponse += line;
+					}
+					client << reponse << crlf;
 				}
 			}
 		}

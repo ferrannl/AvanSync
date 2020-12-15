@@ -1,5 +1,12 @@
 #include "CommandoController.h"
+#include <iostream>
+#include <filesystem>
+#include <chrono>
+#include <ctime>
+#include <fstream>
 
+namespace fs = std::filesystem;
+using namespace std::chrono_literals;
 using namespace Controllers;
 
 CommandoController::CommandoController()
@@ -7,72 +14,74 @@ CommandoController::CommandoController()
 	_response = {};
 }
 
-std::string CommandoController::runCommand(const std::string& command)
+void CommandoController::runCommand(const std::string& command)
 {
+	_response.clear();
 	if (command.find("info") == 0) {
-		return info();
+		info();
 	}
-	if (command.find("dir") == 0) {
-		return dir();
+	else if (command.find("dir") == 0) {
+		dir();
 	}
-	if (command.find("get") == 0) {
-		return get();
+	else if (command.find("get") == 0) {
+		get();
 	}
-	if (command.find("put") == 0) {
-		return put();
+	else if (command.find("put") == 0) {
+		put();
 	}
-	if (command.find("ren") == 0) {
-		return ren();
+	else if (command.find("ren") == 0) {
+		ren();
 	}
-	if (command.find("del") == 0) {
-		return del();
+	else if (command.find("del") == 0) {
+		del();
 	}
-	if (command.find("mkdir") == 0) {
-		return mkdir();
+	else if (command.find("mkdir") == 0) {
+		mkdir();
 	}
-	if (command.find("quit") == 0) {
-		return quit();
+	else if (command.find("quit") == 0) {
+		quit();
 	}
-	return "unknown command";
+	else {
+		_response.push_back("Error.");
+	}
 }
 
-std::string CommandoController::info()
+void CommandoController::info()
 {
-	_response = { "AvanSync server 1.0, copyright (c) 2020 Bob Polis, glashelder." };
-	return _response;
+	_response.push_back("AvanSync server 1.0, copyright (c) 2020 Bob Polis, glashelder.");
 }
 
-std::string CommandoController::dir()
+void CommandoController::dir()
 {
-	return _response;
+	_response.push_back("kanker DIR");
 }
 
-std::string CommandoController::get()
+void CommandoController::get()
 {
-	return _response;
+	_response.push_back("kanker GET");
 }
 
-std::string CommandoController::put()
+void CommandoController::put()
 {
-	return _response;
 }
 
-std::string CommandoController::ren()
+void CommandoController::ren()
 {
-	return _response;
 }
 
-std::string CommandoController::del()
+void CommandoController::del()
 {
-	return _response;
 }
 
-std::string CommandoController::mkdir()
+void CommandoController::mkdir()
 {
-	return _response;
 }
 
-std::string CommandoController::quit()
+void CommandoController::quit()
+{
+}
+
+std::vector<std::string> Controllers::CommandoController::get_response()
 {
 	return _response;
 }
