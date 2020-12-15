@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <filesystem>
 
+namespace fs = std::filesystem;
 
 namespace
 	Controllers {
@@ -16,7 +18,7 @@ namespace
 
 		void runCommand(const std::string& command);
 		void info();
-		void dir();
+		void dir(const std::string& path);
 		void get();
 		void put();
 		void ren();

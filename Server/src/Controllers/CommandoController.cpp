@@ -1,12 +1,9 @@
 #include "CommandoController.h"
 #include <iostream>
-#include <filesystem>
 #include <chrono>
 #include <ctime>
 #include <fstream>
 
-namespace fs = std::filesystem;
-using namespace std::chrono_literals;
 using namespace Controllers;
 
 CommandoController::CommandoController()
@@ -21,7 +18,7 @@ void CommandoController::runCommand(const std::string& command)
 		info();
 	}
 	else if (command.find("dir") == 0) {
-		dir();
+		dir(command.substr(3, command.length() - 3));
 	}
 	else if (command.find("get") == 0) {
 		get();
@@ -51,9 +48,11 @@ void CommandoController::info()
 	_response.push_back("AvanSync server 1.0, copyright (c) 2020 Bob Polis, glashelder.");
 }
 
-void CommandoController::dir()
+void CommandoController::dir(const std::string& path)
 {
-	_response.push_back("kanker DIR");
+	//std::string path1 = "C:/Users/Ferran/Documents/Git_repos/CPP2-Eindopdracht/AvanSync";
+	for (const auto& entry : fs::directory_iterator(path))
+		_response.push_back(entry.path().string() + "");
 }
 
 void CommandoController::get()
