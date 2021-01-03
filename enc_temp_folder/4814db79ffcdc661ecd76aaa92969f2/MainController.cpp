@@ -45,7 +45,7 @@ void Server::Controllers::MainController::run()
 			}
 
 			processCommand(cmd, rest);
-			_client << rest << crlf;
+
 			if (request == "disconnect") {
 				break;
 			}
@@ -53,28 +53,28 @@ void Server::Controllers::MainController::run()
 	}
 }
 
-void Controllers::MainController::processCommand(const std::string& command, std::string& rest)
+void Controllers::MainController::processCommand(const std::string& command, const std::string& path)
 {
 	if (command == "INFO") {
 		_factory.get_command(Enums::CommandEnum::GET_SERVER_INFO)->execute(_client);
 	}
 	else if (command == "DIR") {
-		_factory.get_command(Enums::CommandEnum::GET_DIRECTORY_LISTING)->execute(_client, rest);
+		_factory.get_command(Enums::CommandEnum::GET_DIRECTORY_LISTING)->execute(_client, path);
 	}
 	else if (command == "GET") {
-		_factory.get_command(Enums::CommandEnum::DOWNLOAD_FILE)->execute(_client, rest);
+		_factory.get_command(Enums::CommandEnum::DOWNLOAD_FILE)->execute(_client, path);
 	}
 	else if (command == "PUT") {
-		_factory.get_command(Enums::CommandEnum::UPLOAD_FILE)->execute(_client, rest);
+		_factory.get_command(Enums::CommandEnum::UPLOAD_FILE)->execute(_client, path);
 	}
 	else if (command == "REN") {
-		_factory.get_command(Enums::CommandEnum::RENAME)->execute(_client, rest);
+		_factory.get_command(Enums::CommandEnum::RENAME)->execute(_client, path);
 	}
 	else if (command == "DEL") {
-		_factory.get_command(Enums::CommandEnum::DELETE_ITEM)->execute(_client, rest);
+		_factory.get_command(Enums::CommandEnum::DELETE_ITEM)->execute(_client, path);
 	}
 	else if (command == "MKDIR") {
-		_factory.get_command(Enums::CommandEnum::CREATE_DIRECTORY)->execute(_client, rest);
+		_factory.get_command(Enums::CommandEnum::CREATE_DIRECTORY)->execute(_client, path);
 	}
 	else if (command == "quit") {
 		_factory.get_command(Enums::CommandEnum::DISCONNECT)->execute(_client);

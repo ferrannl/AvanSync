@@ -14,6 +14,7 @@ int main() {
 		const char* lf{ "\n" };
 		const char* crlf{ "\r\n" };
 		std::unique_ptr<OperationFactory> _operationFactory{ std::make_unique<OperationFactory>() };
+		_operationFactory->GetOperation("HOI");
 		asio::ip::tcp::iostream server{ server_address, server_port };
 		if (!server) throw std::runtime_error("could not connect to server");
 
@@ -27,7 +28,6 @@ int main() {
 
 				if (resp == "Bye.") break;
 
-				// Instructions still running from previous operation
 				if (!requestType.empty())
 				{
 					if (requestType == "DIR") {
@@ -43,11 +43,8 @@ int main() {
 					else if (requestType == "GET") {
 
 					}
-					requestType.clear();
 				}
 
-
-				// New Instruction of user
 				std::cout << prompt;
 				std::string req;
 				std::string data;

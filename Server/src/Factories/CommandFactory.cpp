@@ -33,6 +33,5 @@ const std::unique_ptr<Commands::Command>& Factories::CommandFactory::get_command
 	if (_commands.find(command) != _commands.end()) {
 		return _commands.at(command);
 	}
-
 	return nullptr;
 }

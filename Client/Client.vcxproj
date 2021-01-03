@@ -19,7 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Operations\DirOperation.cpp" />
+    <ClCompile Include="src\Operations\InfoOperation.cpp" />
+    <ClCompile Include="src\Factories\OperationFactory.cpp" />
+    <ClCompile Include="src\Controllers\MainController.cpp" />
     <ClCompile Include="src\Client.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Operations\Operation.h" />
+    <ClInclude Include="src\Operations\DirOperation.h" />
+    <ClInclude Include="src\Operations\InfoOperation.h" />
+    <ClInclude Include="src\Factories\OperationFactory.h" />
+    <ClInclude Include="src\Controllers\MainController.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -8,8 +8,8 @@ namespace Server {
 		class DirCommand : public Command {
 		public:
 			DirCommand(std::shared_ptr<Controllers::MainController>);
-			void execute(asio::ip::tcp::iostream& stream, std::string& path);
 
+			void execute(asio::ip::tcp::iostream&, const std::string & = "");
 		private:
 
 			template <typename TP>

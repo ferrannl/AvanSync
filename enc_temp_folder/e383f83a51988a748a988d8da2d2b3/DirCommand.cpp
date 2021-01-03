@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+
 #include "DirCommand.h"
 #include "../Controllers/MainController.h"
 #include <filesystem>
@@ -10,7 +11,7 @@ Server::Commands::DirCommand::DirCommand(std::shared_ptr<Controllers::MainContro
 {
 }
 
-void Server::Commands::DirCommand::execute(asio::ip::tcp::iostream& stream, std::string& data)
+void Server::Commands::DirCommand::execute(asio::ip::tcp::iostream& stream, const std::string& path)
 {
 	const char* crlf{ "\r\n" };
 	std::string p;
@@ -27,8 +28,6 @@ void Server::Commands::DirCommand::execute(asio::ip::tcp::iostream& stream, std:
 
 	std::ostringstream oss;
 	try {
-	if(std::filesystem::is_directory(p2))
-	{
 		for (const auto& entry : std::filesystem::directory_iterator(p2)) {
 			if (entry.is_directory()) {
 				type = "D";
@@ -50,16 +49,10 @@ void Server::Commands::DirCommand::execute(asio::ip::tcp::iostream& stream, std:
 
 			oss << type << "|" << name << "|" << time << "|" << size << "\r\n";
 		}
-		data.append(oss.str());
-		data.pop_back();
-		data.pop_back();
-		
-	} else
-	{
-		data.append("Error: path not found");
-	}
+
+		stream << (oss.str());
 	}
 	catch (...) {
-		data.append("Error: something went wrong while reading the files");
+		stream << "Error: something went wrong while reading the files" << "\r\n";
 	}
 }
