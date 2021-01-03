@@ -1,8 +1,3 @@
-//
-// client.cpp
-//
-// Created by Bob Polis at 2020-12-02
-//
 
 #include <iostream>
 #include <cstdlib>

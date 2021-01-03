@@ -52,7 +52,7 @@ void CommandoController::dir(const std::string& path)
 {
 	//std::string path1 = "C:/Users/Ferran/Documents/Git_repos/CPP2-Eindopdracht/AvanSync";
 	for (const auto& entry : fs::directory_iterator(path))
-		_response.push_back(entry.path().string() + "");
+		_response.push_back(entry.path().string());
 }
 
 void CommandoController::get()
