@@ -19,11 +19,35 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Commands\DeleteCommand.cpp" />
+    <ClCompile Include="src\Commands\CreateDirectoryCommand.cpp" />
+    <ClCompile Include="src\Commands\DisconnectCommand.cpp" />
+    <ClCompile Include="src\Commands\DownloadFileCommand.cpp" />
+    <ClCompile Include="src\Commands\GetDirectoryListingCommand.cpp" />
+    <ClCompile Include="src\Commands\GetServerInfoCommand.cpp" />
+    <ClCompile Include="src\Commands\RenameCommand.cpp" />
+    <ClCompile Include="src\Commands\SyncDirectoryCommand.cpp" />
+    <ClCompile Include="src\Commands\UploadFileCommand.cpp" />
+    <ClCompile Include="src\Factories\CommandFactory.cpp" />
     <ClCompile Include="src\Controllers\CommandoController.cpp" />
+    <ClCompile Include="src\Controllers\MainController.cpp" />
     <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Commands\DeleteCommand.h" />
+    <ClInclude Include="src\Commands\CreateDirectoryCommand.h" />
+    <ClInclude Include="src\Commands\BaseCommand.h" />
+    <ClInclude Include="src\Commands\DisconnectCommand.h" />
+    <ClInclude Include="src\Commands\DownloadFileCommand.h" />
+    <ClInclude Include="src\Commands\GetDirectoryListingCommand.h" />
+    <ClInclude Include="src\Commands\GetServerInfoCommand.h" />
+    <ClInclude Include="src\Commands\RenameCommand.h" />
+    <ClInclude Include="src\Commands\SyncDirectoryCommand.h" />
+    <ClInclude Include="src\Commands\UploadFileCommand.h" />
+    <ClInclude Include="src\Enums\CommandEnum.h" />
     <ClInclude Include="src\Controllers\CommandoController.h" />
+    <ClInclude Include="src\Controllers\MainController.h" />
+    <ClInclude Include="src\Factories\CommandFactory.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

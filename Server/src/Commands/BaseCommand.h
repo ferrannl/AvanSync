@@ -1,9 +1,11 @@
 #pragma once
+#include <memory>
+#include <string>
+#include <vector>
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>
 #include <asio.hpp>
-#include <vector>
 
 namespace Server {
 	namespace Controllers {
@@ -19,20 +21,21 @@ namespace Server {
 
 			virtual void execute(asio::ip::tcp::iostream&, const std::string & = "") = 0;
 
-			int nthOccurrence(const std::string& str, const char find, int nth) {
-				size_t pos = 0;
-				int counter = 0;
-				while (counter != nth) {
+			int nthOccurrence(const std::string& str, const char findMe, int nth)
+			{
+				size_t  pos = 0;
+				int     cnt = 0;
+
+				while (cnt != nth)
+				{
 					pos += 1;
-					pos = str.find(find, pos);
+					pos = str.find(findMe, pos);
 					if (pos == std::string::npos)
 						return -1;
-					++counter;
+					cnt++;
 				}
 				return pos;
 			}
 		};
 	}
-
-
 }

@@ -1,16 +1,16 @@
+#include "MainController.h"
+#include <iostream>
+#include <cstdlib>
 #include <string>
 #include <stdexcept>
 #include <asio.hpp>
-#include <iostream>
-#include <cstdlib>
-#include "MainController.h"
 
 using namespace Server;
 
-Controllers::MainController::MainController() {};
+Controllers::MainController::MainController() {}
 
-void Server::Controllers::MainController::run() {
-
+void Server::Controllers::MainController::run()
+{
 	_factory = { shared_from_this() };
 	const int server_port{ 12345 };
 	const char* lf{ "\n" };
@@ -21,13 +21,13 @@ void Server::Controllers::MainController::run() {
 
 	for (;;) {
 		std::cerr << "waiting for client to connect\n";
-		asio::ip::tcp::iostream client;
-		server.accept(client.socket());
-		std::cerr << "client connected from " << client.socket().local_endpoint() << lf;
-		client << "Welcome to AvanSync server 1.0" << crlf;
+
+		server.accept(_client.socket());
+		std::cerr << "client connected from " << _client.socket().local_endpoint() << lf;
+		_client << "Welcome to AvanSync server 1.0" << crlf;
 		for (;;) {
 			std::string request;
-			getline(client, request);
+			getline(_client, request);
 			request.erase(request.end() - 1); // remove '\r'
 			std::cerr << "client says: " << request << lf;
 
@@ -45,7 +45,7 @@ void Server::Controllers::MainController::run() {
 				cmd = request;
 			}
 
-			runCommand(cmd, rest);
+			processCommand(cmd, rest);
 
 			if (request == "disconnect") {
 				break;
@@ -54,7 +54,8 @@ void Server::Controllers::MainController::run() {
 	}
 }
 
-void Controllers::MainController::runCommand(const std::string& command, const std::string& path) {
+void Controllers::MainController::processCommand(const std::string& command, const std::string& path)
+{
 	if (command == "info") {
 		_factory.get_command(Enums::CommandEnum::GET_SERVER_INFO)->execute(_client);
 	}
@@ -74,28 +75,9 @@ void Controllers::MainController::runCommand(const std::string& command, const s
 		_factory.get_command(Enums::CommandEnum::DELETE_ITEM)->execute(_client, path);
 	}
 	else if (command == "create") {
-		_factory.get_command(Enums::CommandEnum::CREATE_DIR)->execute(_client, path);
+		_factory.get_command(Enums::CommandEnum::CREATE_DIRECTORY)->execute(_client, path);
 	}
 	else {
 		_client << "Invalid Command" << "\r\n";
 	}
 }
-
-//if (request == "quit") {
-//	client << "Bye." << crlf;
-//	std::cerr << "will disconnect from client " << client.socket().local_endpoint() << lf;
-//	break;
-//}
-//else {
-//	//fills response list
-//	commandoController->runCommand(request);
-//	//gets response list
-//	std::vector<std::string> responseList = commandoController->get_response();
-//	//loops through response list
-//	std::string reponse = {};
-//	for (std::string line : responseList)
-//	{
-//		reponse += line;
-//	}
-//	client << reponse << crlf;
-//}

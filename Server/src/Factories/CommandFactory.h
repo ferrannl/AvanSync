@@ -1,15 +1,20 @@
 #pragma once
-#include <vector>
+#include <memory>
+#include <map>
+#include "../Enums/CommandEnum.h"
+#include "../Commands/BaseCommand.h"
 
 namespace Server {
 	namespace Factories {
-
 		class CommandFactory {
 		private:
-			//std::vector < std::pair<> _commands;
+			std::map<Enums::CommandEnum, std::unique_ptr<Commands::BaseCommand>> _commands;
+
 		public:
 			CommandFactory();
-			void get_command();
+			CommandFactory(std::shared_ptr<Controllers::MainController>);
+
+			const std::unique_ptr<Commands::BaseCommand>& get_command(Enums::CommandEnum) const;
 		};
 	}
 }
