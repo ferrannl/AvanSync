@@ -3,9 +3,9 @@
 
 namespace Server {
 	namespace Commands {
-		class GetServerInfoCommand : public BaseCommand {
+		class GetCommand : public BaseCommand {
 		public:
-			GetServerInfoCommand(std::shared_ptr<Controllers::MainController>);
+			GetCommand(std::shared_ptr<Controllers::MainController>);
 
 			void execute(asio::ip::tcp::iostream&, const std::string & = "");
 		};

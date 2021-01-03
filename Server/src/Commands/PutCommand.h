@@ -3,9 +3,9 @@
 
 namespace Server {
 	namespace Commands {
-		class DownloadFileCommand : public BaseCommand {
+		class PutCommand : public BaseCommand {
 		public:
-			DownloadFileCommand(std::shared_ptr<Controllers::MainController>);
+			PutCommand(std::shared_ptr<Controllers::MainController>);
 
 			void execute(asio::ip::tcp::iostream&, const std::string & = "");
 		};

@@ -3,9 +3,9 @@
 
 namespace Server {
 	namespace Commands {
-		class UploadFileCommand : public BaseCommand {
+		class InfoCommand : public BaseCommand {
 		public:
-			UploadFileCommand(std::shared_ptr<Controllers::MainController>);
+			InfoCommand(std::shared_ptr<Controllers::MainController>);
 
 			void execute(asio::ip::tcp::iostream&, const std::string & = "");
 		};

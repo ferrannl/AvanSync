@@ -1,14 +1,13 @@
 #pragma once
-#define _CRT_SECURE_NO_WARNINGS
 #include "../Commands/BaseCommand.h"
 #include <chrono>
 #include <ctime>
 
 namespace Server {
 	namespace Commands {
-		class GetDirectoryListingCommand : public BaseCommand {
+		class DirCommand : public BaseCommand {
 		public:
-			GetDirectoryListingCommand(std::shared_ptr<Controllers::MainController>);
+			DirCommand(std::shared_ptr<Controllers::MainController>);
 
 			void execute(asio::ip::tcp::iostream&, const std::string & = "");
 		private:

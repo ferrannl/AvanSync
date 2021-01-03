@@ -62,20 +62,23 @@ void Controllers::MainController::processCommand(const std::string& command, con
 	else if (command == "dir") {
 		_factory.get_command(Enums::CommandEnum::GET_DIRECTORY_LISTING)->execute(_client, path);
 	}
-	else if (command == "disconnect") {
-		_factory.get_command(Enums::CommandEnum::DISCONNECT)->execute(_client);
-	}
-	else if (command == "download") {
+	else if (command == "get") {
 		_factory.get_command(Enums::CommandEnum::DOWNLOAD_FILE)->execute(_client, path);
 	}
-	else if (command == "rename") {
+	else if (command == "put") {
+		_factory.get_command(Enums::CommandEnum::UPLOAD_FILE)->execute(_client, path);
+	}
+	else if (command == "ren") {
 		_factory.get_command(Enums::CommandEnum::RENAME)->execute(_client, path);
 	}
-	else if (command == "remove") {
+	else if (command == "del") {
 		_factory.get_command(Enums::CommandEnum::DELETE_ITEM)->execute(_client, path);
 	}
-	else if (command == "create") {
+	else if (command == "mkdir") {
 		_factory.get_command(Enums::CommandEnum::CREATE_DIRECTORY)->execute(_client, path);
+	}
+	else if (command == "quit") {
+		_factory.get_command(Enums::CommandEnum::DISCONNECT)->execute(_client);
 	}
 	else {
 		_client << "Invalid Command" << "\r\n";

@@ -1,16 +1,17 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "GetDirectoryListingCommand.h"
+
+#include "DirCommand.h"
 #include "../Controllers/MainController.h"
 #include <filesystem>
 #include <time.h>
 #include <ctime>
 
-Server::Commands::GetDirectoryListingCommand::GetDirectoryListingCommand(std::shared_ptr<Controllers::MainController> main) : BaseCommand{ main }
+Server::Commands::DirCommand::DirCommand(std::shared_ptr<Controllers::MainController> main) : BaseCommand{ main }
 {
 }
 
-void Server::Commands::GetDirectoryListingCommand::execute(asio::ip::tcp::iostream& stream, const std::string& path)
+void Server::Commands::DirCommand::execute(asio::ip::tcp::iostream& stream, const std::string& path)
 {
 	const char* crlf{ "\r\n" };
 	std::filesystem::path p = "";

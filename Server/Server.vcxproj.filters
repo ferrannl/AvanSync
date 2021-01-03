@@ -36,22 +36,22 @@
     <ClCompile Include="src\Commands\DisconnectCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Commands\DownloadFileCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Commands\GetDirectoryListingCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Commands\GetServerInfoCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Commands\RenameCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Commands\SyncDirectoryCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Commands\UploadFileCommand.cpp">
+    <ClCompile Include="src\Commands\InfoCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Commands\GetCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Commands\DirCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Commands\PutCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,25 +77,25 @@
     <ClInclude Include="src\Commands\DisconnectCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Commands\DownloadFileCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Commands\GetDirectoryListingCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Commands\GetServerInfoCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Commands\RenameCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Commands\SyncDirectoryCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Commands\UploadFileCommand.h">
+    <ClInclude Include="src\Factories\CommandFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Factories\CommandFactory.h">
+    <ClInclude Include="src\Commands\InfoCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Commands\GetCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Commands\DirCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Commands\PutCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
