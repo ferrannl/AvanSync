@@ -1,13 +1,13 @@
-#include "RenameCommand.h"
+#include "RenCommand.h"
 #include "../Controllers/MainController.h"
 #include <filesystem>
 #include <fstream>
 
-Server::Commands::RenameCommand::RenameCommand(std::shared_ptr<Controllers::MainController> main) : BaseCommand{ main }
+Server::Commands::RenCommand::RenCommand(std::shared_ptr<Controllers::MainController> main) : Command{ main }
 {
 }
 
-void Server::Commands::RenameCommand::execute(asio::ip::tcp::iostream& stream, const std::string& path)
+void Server::Commands::RenCommand::execute(asio::ip::tcp::iostream& stream, const std::string& path)
 {
 	std::filesystem::path p = "";
 

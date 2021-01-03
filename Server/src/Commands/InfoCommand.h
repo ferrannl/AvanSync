@@ -1,9 +1,9 @@
 #pragma once
-#include "../Commands/BaseCommand.h"
+#include "../Commands/Command.h"
 
 namespace Server {
 	namespace Commands {
-		class InfoCommand : public BaseCommand {
+		class InfoCommand : public Command {
 		public:
 			InfoCommand(std::shared_ptr<Controllers::MainController>);
 

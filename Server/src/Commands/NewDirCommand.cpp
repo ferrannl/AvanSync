@@ -1,12 +1,12 @@
-#include "CreateDirectoryCommand.h"
+#include "NewDirCommand.h"
 #include "../Controllers/MainController.h"
 #include <filesystem>
 
-Server::Commands::CreateDirectoryCommand::CreateDirectoryCommand(std::shared_ptr<Controllers::MainController> main) : BaseCommand{ main }
+Server::Commands::NewDirCommand::NewDirCommand(std::shared_ptr<Controllers::MainController> main) : Command{ main }
 {
 }
 
-void Server::Commands::CreateDirectoryCommand::execute(asio::ip::tcp::iostream& stream, const std::string& path)
+void Server::Commands::NewDirCommand::execute(asio::ip::tcp::iostream& stream, const std::string& path)
 {
 	std::filesystem::path p(path.substr(0, path.find(" ")));
 	std::string existing = path.substr(path.find(" ") + 1, path.length());

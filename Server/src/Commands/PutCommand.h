@@ -1,9 +1,9 @@
 #pragma once
-#include "../Commands/BaseCommand.h"
+#include "../Commands/Command.h"
 
 namespace Server {
 	namespace Commands {
-		class PutCommand : public BaseCommand {
+		class PutCommand : public Command {
 		public:
 			PutCommand(std::shared_ptr<Controllers::MainController>);
 

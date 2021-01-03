@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 
-Server::Commands::GetCommand::GetCommand(std::shared_ptr<Controllers::MainController> main) : BaseCommand{ main }
+Server::Commands::GetCommand::GetCommand(std::shared_ptr<Controllers::MainController> main) : Command{ main }
 {
 }
 

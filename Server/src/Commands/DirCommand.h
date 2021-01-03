@@ -1,11 +1,11 @@
 #pragma once
-#include "../Commands/BaseCommand.h"
+#include "../Commands/Command.h"
 #include <chrono>
 #include <ctime>
 
 namespace Server {
 	namespace Commands {
-		class DirCommand : public BaseCommand {
+		class DirCommand : public Command {
 		public:
 			DirCommand(std::shared_ptr<Controllers::MainController>);
 

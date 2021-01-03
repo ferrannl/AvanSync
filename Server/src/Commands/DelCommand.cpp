@@ -1,12 +1,12 @@
-#include "DeleteCommand.h"
+#include "DelCommand.h"
 #include "../Controllers/MainController.h"
 #include <filesystem>
 
-Server::Commands::DeleteCommand::DeleteCommand(std::shared_ptr<Controllers::MainController> main) : BaseCommand{ main }
+Server::Commands::DelCommand::DelCommand(std::shared_ptr<Controllers::MainController> main) : Command{ main }
 {
 }
 
-void Server::Commands::DeleteCommand::execute(asio::ip::tcp::iostream& stream, const std::string& path)
+void Server::Commands::DelCommand::execute(asio::ip::tcp::iostream& stream, const std::string& path)
 {
 	std::filesystem::path p(path.substr(0, path.find(" ")));
 	std::string name = path.substr(path.find(" ") + 1, path.length());

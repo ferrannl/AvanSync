@@ -7,7 +7,7 @@
 #include <time.h>
 #include <ctime>
 
-Server::Commands::DirCommand::DirCommand(std::shared_ptr<Controllers::MainController> main) : BaseCommand{ main }
+Server::Commands::DirCommand::DirCommand(std::shared_ptr<Controllers::MainController> main) : Command{ main }
 {
 }
 

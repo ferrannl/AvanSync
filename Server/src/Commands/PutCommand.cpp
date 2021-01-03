@@ -1,7 +1,7 @@
 #include "PutCommand.h"
 #include "../Controllers/MainController.h"
 
-Server::Commands::PutCommand::PutCommand(std::shared_ptr<Controllers::MainController> main) : BaseCommand{ main }
+Server::Commands::PutCommand::PutCommand(std::shared_ptr<Controllers::MainController> main) : Command{ main }
 {
 }
 

@@ -13,11 +13,11 @@ namespace Server {
 	}
 
 	namespace Commands {
-		class BaseCommand {
+		class Command {
 		protected:
 			std::shared_ptr<Controllers::MainController> _main;
 		public:
-			BaseCommand(std::shared_ptr<Controllers::MainController> main) : _main{ main } {};
+			Command(std::shared_ptr<Controllers::MainController> main) : _main{ main } {};
 
 			virtual void execute(asio::ip::tcp::iostream&, const std::string & = "") = 0;
 

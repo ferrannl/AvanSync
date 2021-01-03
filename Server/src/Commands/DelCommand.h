@@ -3,9 +3,9 @@
 
 namespace Server {
 	namespace Commands {
-		class GetCommand : public Command {
+		class DelCommand : public Command {
 		public:
-			GetCommand(std::shared_ptr<Controllers::MainController>);
+			DelCommand(std::shared_ptr<Controllers::MainController>);
 
 			void execute(asio::ip::tcp::iostream&, const std::string & = "");
 		};

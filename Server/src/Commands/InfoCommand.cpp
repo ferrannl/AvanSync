@@ -1,7 +1,7 @@
 #include "InfoCommand.h"
 #include "../Controllers/MainController.h"
 
-Server::Commands::InfoCommand::InfoCommand(std::shared_ptr<Controllers::MainController> main) : BaseCommand{ main }
+Server::Commands::InfoCommand::InfoCommand(std::shared_ptr<Controllers::MainController> main) : Command{ main }
 {
 }
 
