@@ -19,16 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Operations\PutOperation.cpp" />
-    <ClCompile Include="src\Operations\GetOperation.cpp" />
-    <ClCompile Include="src\Operations\QuitOperation.cpp" />
-    <ClCompile Include="src\Operations\DelOperation.cpp" />
-    <ClCompile Include="src\Operations\DirOperation.cpp" />
-    <ClCompile Include="src\Operations\InfoOperation.cpp" />
-    <ClCompile Include="src\Factories\OperationFactory.cpp" />
-    <ClCompile Include="src\Controllers\MainController.cpp" />
     <ClCompile Include="src\Client.cpp" />
-    <ClCompile Include="src\Operations\SyncOperation.cpp" />
+    <ClCompile Include="src\Controllers\MainController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Operations\PutOperation.h" />

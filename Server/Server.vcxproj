@@ -19,20 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Commands\DelCommand.cpp" />
-    <ClCompile Include="src\Commands\NewDirCommand.cpp" />
-    <ClCompile Include="src\Commands\QuitCommand.cpp" />
-    <ClCompile Include="src\Commands\GetCommand.cpp" />
-    <ClCompile Include="src\Commands\DirCommand.cpp" />
-    <ClCompile Include="src\Commands\InfoCommand.cpp" />
-    <ClCompile Include="src\Commands\RenCommand.cpp" />
-    <ClCompile Include="src\Commands\DirSyncCommand.cpp" />
-    <ClCompile Include="src\Commands\PutCommand.cpp" />
-    <ClCompile Include="src\Factories\CommandFactory.cpp" />
     <ClCompile Include="src\Controllers\MainController.cpp" />
     <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Commands\CommandFactory.h" />
     <ClInclude Include="src\Commands\DelCommand.h" />
     <ClInclude Include="src\Commands\NewDirCommand.h" />
     <ClInclude Include="src\Commands\Command.h" />
@@ -45,7 +36,6 @@
     <ClInclude Include="src\Commands\DirSyncCommand.h" />
     <ClInclude Include="src\Enums\CommandEnum.h" />
     <ClInclude Include="src\Controllers\MainController.h" />
-    <ClInclude Include="src\Factories\CommandFactory.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

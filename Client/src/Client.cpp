@@ -3,107 +3,167 @@
 #include <string>
 #include <stdexcept>
 #include <asio.hpp>
+#include <filesystem>
 #include <fstream>
+namespace fs = std::filesystem;
 
-#include "Controllers/MainController.h"
-#include "Factories/OperationFactory.h"
+void mkdir(std::string req, asio::ip::tcp::iostream& server) {
+    if (getline(std::cin, req)) {
+        server << req << "\r\n";
+    }
+    if (getline(std::cin, req)) {
+        server << req << "\r\n";
+    }
+    std::string result;
+    if (getline(server, result)) {
+        std::cout << result + "\n";
+    }
+}
+
+void ren(std::string req, asio::ip::tcp::iostream& server) {
+    if (getline(std::cin, req)) {
+        server << req << "\r\n"; 
+    }
+    if (getline(std::cin, req)) {
+        server << req << "\r\n";
+    }
+    std::string result;
+    if (getline(server, result)) {
+        std::cout << result + "\n";
+    }
+}
+
+void del(std::string req, asio::ip::tcp::iostream& server) {
+    if (getline(std::cin, req)) {
+        server << req << "\r\n";
+    }
+    std::string result;
+    if (getline(server, result)) {
+        std::cout << result + "\n";
+    }
+}
+
+void quit(std::string req, asio::ip::tcp::iostream& server) {
+    server << req << "\r\n";
+    std::cerr << "will disconnect from client " << server.socket().local_endpoint() << "\n";
+
+}
+
+void info(std::string req, asio::ip::tcp::iostream& server) {
+        server << req << "\r\n";
+}
+
+void dir(std::string req, asio::ip::tcp::iostream& server)
+{
+    if (getline(std::cin, req)) {
+        server << req << "\r\n";
+    }
+    std::string result;
+    if (getline(server, result))
+    {
+        int iterations = std::stoi(result);
+        for (int i = 0; i < iterations; ++i)
+        {
+            if (getline(server, result))
+            {
+                std::cout << result << "\n";
+            }
+        }
+    }
+}
+
+void get(std::string req, asio::ip::tcp::iostream& server) {
+    if (getline(std::cin, req)) {
+        server << req << "\r\n";
+    }
+    std::string result;
+    if (getline(server, result)) {
+        int iterations = std::stoi(result);
+        std::string byte;
+        std::string result_string;
+        for (int i = 0; i < iterations; ++i)
+        {
+            if (getline(server, byte))
+            {
+                result_string += byte;
+                std::cout << byte << "\n";
+            }
+        }
+        std::string client_path = "D:\\CPP\\test\client";
+        std::ofstream streamresult(client_path + "\test.txt");
+        streamresult << result_string;
+        streamresult.close();
+    }
+}
+
+void put(std::string req, asio::ip::tcp::iostream& server) {
+    if (getline(std::cin, req)) {
+        std::string result = req.substr(4, req.length());
+        if (fs::exists(result)) {
+            float size = fs::file_size(result);
+            req += " ";
+            req += std::to_string(size);
+        }
+    }
+}
+
+
 
 int main() {
-	try {
-		const char* server_address{ "localhost" };
-		const char* server_port{ "12345" };
-		const char* prompt{ "avansync> " };
-		const char* lf{ "\n" };
-		const char* crlf{ "\r\n" };
-		std::unique_ptr<OperationFactory> _operationFactory{ std::make_unique<OperationFactory>() };
-		std::string requestType;
-		asio::ip::tcp::iostream server{ server_address, server_port };
-		if (!server) throw std::runtime_error("could not connect to server");
+    try {
+        const char* server_address{ "localhost" };
+        const char* server_port{ "12345" };
+        const char* prompt{ "avansync> " };
+        const char* lf{ "\n" };
+        const char* crlf{ "\r\n" };
 
-		while (server) {
-			std::string resp;
+        asio::ip::tcp::iostream server{ server_address, server_port };
+        if (!server) throw std::runtime_error("could not connect to server");
 
-			if (getline(server, resp)) {
-				resp.erase(resp.end() - 1); // remove '\r'
-				std::cout << resp << lf;
+        while (server) {
+            std::string resp;
+            if (getline(server, resp)) {
+                resp.erase(resp.end() - 1); // remove '\r'
+                std::cout << resp << lf;
+                if (resp == "Bye.") break;
 
-				if (resp == "Bye.") break;
+                std::cout << prompt;
+                std::string req;
+                if (getline(std::cin, req)) {
+                    server << req << crlf;
+                    if (req.find("dir") == 0)
+                    {
+                        dir(req, server);
+                    }
+                    else if (req.find("del") == 0) {
+                        del(req, server);
+                    }
+                    else if (req.find("info") == 0) {
+                        info(req, server);
+                    }
+                    else if (req.find("mkdir") == 0) {
+                        mkdir(req, server);
+                    }
+                    else if (req.find("ren") == 0) {
+                        ren(req, server);
+                    }
+                    else if (req.find("quit") == 0) {
+                        quit(req, server);
+                    }
+                    else if (req.find("put") == 0) {
+                        put(req, server);
+                    }
+                    else if (req.find("get") == 0) {
+                        get(req, server);
+                    }
+                }
+            }
+        }
 
-				// Instructions still running from previous operation
-				if (!requestType.empty())
-				{
-					if (requestType == "DIR") {
-						int itemCount = std::stoi(resp);
-						resp.clear();
-
-						for (int i = 0; i < itemCount; ++i) {
-							std::string currentItem;
-							getline(server, currentItem);
-							std::cout << currentItem << lf;
-						}
-					}
-					else if (requestType == "GET") {
-						try
-						{
-							if (resp != "Error: no permission" && resp != "Error: no such file")
-							{
-								int byteCount = std::stoi(resp);
-								std::string path;
-								resp.clear();
-
-								getline(server, path);
-								path.erase(path.end() - 1);
-								std::unique_ptr<char> buffer(new char[byteCount]);
-
-								for (int i = 0; i < byteCount; ++i)
-								{
-									std::string currentItem;
-									getline(server, currentItem);
-									currentItem.erase(currentItem.end() - 1);
-
-									std::istringstream hex_chars_stream(currentItem);
-									std::vector<unsigned char> bytes;
-
-									unsigned int c;
-									while (hex_chars_stream >> std::hex >> c)
-									{
-										bytes.push_back(c);
-									}
-									buffer.get()[i] = bytes.front();
-								}
-								std::ofstream file(path, std::ios::out);
-								file.write(buffer.get(), byteCount);
-							}
-						}
-						catch (...)
-						{
-							std::cout << "GET operation failed.";
-						}
-					}
-					requestType.clear();
-				}
-
-
-				// New Instruction of user
-				std::cout << prompt;
-				std::string req;
-				std::string data;
-
-				if (getline(std::cin, req)) {
-					if (requestType.empty()) {
-						if (_operationFactory->GetOperation(req) != nullptr) {
-							requestType = req;
-							_operationFactory->GetOperation(req)->execute(data);
-						}
-					}
-					server << data << crlf;
-				}
-			}
-		}
-	}
-	catch (const std::exception& ex) {
-		std::cerr << "client: " << ex.what() << '\n';
-		return EXIT_FAILURE;
-	}
-	return EXIT_SUCCESS;
+    }
+    catch (const std::exception& ex) {
+        std::cerr << "client: " << ex.what() << '\n';
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }

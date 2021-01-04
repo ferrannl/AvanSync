@@ -1,11 +1,16 @@
 #pragma once
 
-namespace Client {
-	namespace Controllers {
-		class MainController {
-		public:
-			MainController();
-		private:
-		};
-	}
+namespace Controllers {
+	class MainController {
+	public:
+		void info();
+		void dir();
+		void get();
+		void put();
+		void ren();
+		void del();
+		void mkdir();
+		void quit();
+
+	};
 }

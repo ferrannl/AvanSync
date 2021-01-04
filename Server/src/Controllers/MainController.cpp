@@ -1,88 +1,230 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "MainController.h"
-#include <iostream>
-#include <cstdlib>
-#include <string>
-#include <stdexcept>
-#include <asio.hpp>
+#include <sstream>
+#include <fstream>
 
-using namespace Server;
+using namespace Controllers;
 
-Controllers::MainController::MainController() {}
+template<char delimiter>
+class WordDelimitedBy : public std::string
+{};
 
-void Server::Controllers::MainController::run()
+void MainController::get_right_command(const std::string& command, asio::ip::tcp::iostream& client)
 {
-	_factory = { shared_from_this() };
-	const int server_port{ 12345 };
-	const char* lf{ "\n" };
-	const char* crlf{ "\r\n" };
-
-	asio::io_context io_context;
-	asio::ip::tcp::acceptor server{ io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), server_port) };
-
-	for (;;) {
-		std::cerr << "waiting for client to connect\n";
-		server.accept(_client.socket());
-		std::cerr << "client connected from " << _client.socket().local_endpoint() << lf;
-		_client << "Welcome to AvanSync server 1.0" << crlf;
-
-		for (;;) {
-			std::string request;
-
-			getline(_client, request);
-
-			request.erase(request.end() - 1); // remove '\r'
-
-			std::cerr << "client says: " << request << lf;
-
-			std::string command = "";
-			std::string rest = "";
-
-			try {
-				command = request.substr(0, request.find(" "));
-			}
-			catch (const std::exception& e) {
-			}
-
-			if (command == "") {
-				command = request;
-			}
-
-			processCommand(command, rest);
-			_client << rest << crlf;
-			if (request == "disconnect") {
-				break;
-			}
+	_responses.clear();
+	if (command.find("info") == 0) {
+		std::string result;
+		if (getline(client, result)) {
+			result.erase(result.end() - 1);
+			client << info() << "\r\n";
 		}
 	}
+	else if (command.find("dir") == 0) {
+		std::string result;
+		if (getline(client, result)) {
+			result.erase(result.end() - 1);
+			client << dir(result) << "\r\n";
+		}
+	}
+	else if (command.find("get") == 0) {
+		std::string result;
+		if (getline(client, result)) {
+			result.erase(result.end() - 1);
+			client << get(result) << "\r\n";
+		}
+	}
+	else if (command.find("del") == 0) {
+		std::string result;
+		if (getline(client, result)) {
+			result.erase(result.end() - 1);
+			client << del(result) << "\r\n";
+		}
+	}
+	else if (command.find("mkdir") == 0) {
+		std::string result;
+		std::string result2;
+		if (getline(client, result)) {
+			result.erase(result.end() - 1);
+		}
+		if (getline(client, result2)) {
+			result2.erase(result2.end() - 1);
+		}
+		client << mkdir(result, result2) << "\r\n";
+	}
+	else if (command.find("ren") == 0) {
+		std::string result;
+		std::string result2;
+		if (getline(client, result)) {
+			result.erase(result.end() - 1);
+		}
+		if (getline(client, result2)) {
+			result2.erase(result2.end() - 1);
+		}
+		client << ren(result, result2) << "\r\n";
+	}
+	else if (command.find("put") == 0) {
+		std::string result;
+		std::string result2;
+		if (getline(client, result)) {
+			result.erase(result.end() - 1);
+		}
+		if (getline(client, result)) {
+			result2.erase(result2.end() - 1);
+		}
+		client << put(result, result2) << "\r\n";
+
+		/*std::istringstream iss(command);
+		std::vector<std::string> results((std::istream_iterator<WordDelimitedBy<' '>>(iss)),
+			std::istream_iterator<WordDelimitedBy<' '>>());
+		put(results[1]);*/
+	}
+
+	else {
+		wrong_command();
+	}
 }
 
-void Controllers::MainController::processCommand(const std::string& command, std::string& rest)
+std::string MainController::info()
 {
-	if (command == "INFO") {
-		_factory.get_command(Enums::CommandEnum::GET_SERVER_INFO)->execute(_client);
+	return "AvanSync Server 1.0";
+}
+
+template <typename TP>
+std::time_t to_time_t(const TP& tp)
+{
+	using namespace std::chrono;
+	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now()
+		+ system_clock::now());
+	return system_clock::to_time_t(sctp);
+}
+
+std::string MainController::dir(const std::string& path)
+{
+
+	std::string dir_list;
+	int counter = 0;
+	for (const auto& entry : fs::recursive_directory_iterator(path))
+	{
+		++counter;
 	}
-	else if (command == "DIR") {
-		_factory.get_command(Enums::CommandEnum::GET_DIRECTORY_LISTING)->execute(_client, rest);
+	dir_list += std::to_string(counter) + "\r\n";
+	for (const auto& entry : fs::recursive_directory_iterator(path)) {
+
+		if (entry.is_directory())
+		{
+			dir_list += "D|";
+		}
+		else if (entry.is_regular_file())
+		{
+			dir_list += "F|";
+		}
+		else {
+			dir_list += "|";
+		}
+		dir_list += fs::path(entry.path()).filename().string();
+		dir_list += "|";
+		auto test = fs::last_write_time(entry.path());
+		std::time_t tt = to_time_t(test);
+		std::tm* gmt = std::localtime(&tt);
+		std::stringstream buffer;
+		buffer << std::put_time(gmt, "%F %T");
+		dir_list += buffer.str();
+		dir_list += "|";
+		dir_list += static_cast<std::stringstream>(std::stringstream() << entry.file_size()).str();
+		dir_list += " ";
+		dir_list += "\r\n";
 	}
-	else if (command == "GET") {
-		_factory.get_command(Enums::CommandEnum::DOWNLOAD_FILE)->execute(_client, rest);
+	return dir_list;
+}
+
+std::string Controllers::MainController::get(const std::string& path)
+{
+	std::string return_list;
+	if (fs::exists(path)) {
+		return_list += std::to_string(fs::file_size(path)) + "\r\n";
+		std::string result;
+		std::ifstream streamresult(path);
+		//get length of file
+		streamresult.seekg(0, std::ios::end);
+		size_t length = streamresult.tellg();
+		streamresult.seekg(0, std::ios::beg);
+
+		char buffer[1000];
+		// don't overflow the buffer!
+
+		//read file
+		streamresult.read(buffer, length);
+		for (int i = 0; i < length; ++i)
+		{
+			return_list += buffer[i];
+			return_list += "\r\n";
+		}
 	}
-	else if (command == "PUT") {
-		_factory.get_command(Enums::CommandEnum::UPLOAD_FILE)->execute(_client, rest);
-	}
-	else if (command == "REN") {
-		_factory.get_command(Enums::CommandEnum::RENAME)->execute(_client, rest);
-	}
-	else if (command == "DEL") {
-		_factory.get_command(Enums::CommandEnum::DELETE_ITEM)->execute(_client, rest);
-	}
-	else if (command == "MKDIR") {
-		_factory.get_command(Enums::CommandEnum::CREATE_DIRECTORY)->execute(_client, rest);
-	}
-	else if (command == "QUIT") {
-		_factory.get_command(Enums::CommandEnum::DISCONNECT)->execute(_client);
+	return return_list;
+}
+
+std::string MainController::put(const std::string& path, const std::string& file_size)
+{
+	if (fs::exists(path)) {
+		fs::copy(path, path);
+		return "OK";
 	}
 	else {
-		_client << "Invalid Command" << "\r\n";
+		return "Error: Invalid path";
 	}
 }
+
+std::string MainController::ren(std::string& path, const std::string& new_name)
+{
+	if (std::filesystem::exists(path)) {
+		std::string old_path = path;
+		std::reverse(path.begin(), path.end());
+		std::string end = path.substr(0, path.find("/"));
+		path.erase(0, end.length());
+		std::reverse(path.begin(), path.end());
+		path += new_name;
+		std::filesystem::rename(old_path, path);
+		return "OK \r\n";
+	}
+	else {
+		return "Error: invalid path \r\n";
+	}
+
+}
+
+std::string MainController::del(const std::string& path)
+{
+	if (std::filesystem::exists(path)) {
+		std::filesystem::remove(path);
+		return "OK \r\n";
+	}
+	else {
+		return "Error: no such file or directory \r\n";
+	}
+
+}
+
+std::string MainController::mkdir(const std::string& parent, const std::string& name)
+{
+	if (fs::exists(parent)) {
+		std::string path = parent + name;
+		path.erase(remove_if(path.begin(), path.end(), isspace), path.end());
+		std::filesystem::create_directory(path);
+		return "OK \r\n";
+	}
+	else {
+		return "Error: no such directory \r\n";
+	}
+}
+
+void MainController::wrong_command()
+{
+	_responses.push_back("Invalid Command.");
+}
+
+std::vector<std::string> Controllers::MainController::get_responses()
+{
+	return _responses;
+}
+
+

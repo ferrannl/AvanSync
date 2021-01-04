@@ -1,19 +1,26 @@
 #pragma once
 #include <string>
-#include <memory>
-#include "../Factories/CommandFactory.h"
+#include <vector>
+#include <iostream>
+#include <filesystem>
+#include <asio.hpp>
+namespace fs = std::filesystem;
 
-namespace Server {
-	namespace Controllers {
-		class MainController : public std::enable_shared_from_this<MainController> {
-		public:
-			MainController();
 
-			void processCommand(const std::string&, std::string&);
-			void run();
-		private:
-			asio::ip::tcp::iostream _client;
-			Factories::CommandFactory _factory;
-		};
-	}
+namespace Controllers {
+	class MainController {
+	private:
+		std::vector<std::string> _responses;
+	public:
+		void get_right_command(const std::string& command, asio::ip::tcp::iostream& client);
+		std::string info();
+		std::string dir(const std::string& path);
+		std::string put(const std::string& path, const std::string& file_size);
+		std::string ren(std::string& path, const std::string& new_name);
+		std::string del(const std::string& path);
+		std::string mkdir(const std::string& parent, const std::string& name);
+		std::string get(const std::string& path);
+		void wrong_command();
+		std::vector<std::string> get_responses();
+	};
 }
