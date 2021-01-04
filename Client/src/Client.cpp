@@ -3,6 +3,8 @@
 #include <string>
 #include <stdexcept>
 #include <asio.hpp>
+#include <fstream>
+
 #include "Controllers/MainController.h"
 #include "Factories/OperationFactory.h"
 
@@ -14,12 +16,12 @@ int main() {
 		const char* lf{ "\n" };
 		const char* crlf{ "\r\n" };
 		std::unique_ptr<OperationFactory> _operationFactory{ std::make_unique<OperationFactory>() };
+		std::string requestType;
 		asio::ip::tcp::iostream server{ server_address, server_port };
 		if (!server) throw std::runtime_error("could not connect to server");
 
 		while (server) {
 			std::string resp;
-			std::string requestType;
 
 			if (getline(server, resp)) {
 				resp.erase(resp.end() - 1); // remove '\r'
@@ -41,7 +43,42 @@ int main() {
 						}
 					}
 					else if (requestType == "GET") {
+						try
+						{
+							if (resp != "Error: no permission" && resp != "Error: no such file")
+							{
+								int byteCount = std::stoi(resp);
+								std::string path;
+								resp.clear();
 
+								getline(server, path);
+								path.erase(path.end() - 1);
+								std::unique_ptr<char> buffer(new char[byteCount]);
+
+								for (int i = 0; i < byteCount; ++i)
+								{
+									std::string currentItem;
+									getline(server, currentItem);
+									currentItem.erase(currentItem.end() - 1);
+
+									std::istringstream hex_chars_stream(currentItem);
+									std::vector<unsigned char> bytes;
+
+									unsigned int c;
+									while (hex_chars_stream >> std::hex >> c)
+									{
+										bytes.push_back(c);
+									}
+									buffer.get()[i] = bytes.front();
+								}
+								std::ofstream file(path, std::ios::out);
+								file.write(buffer.get(), byteCount);
+							}
+						}
+						catch (...)
+						{
+							std::cout << "GET operation failed.";
+						}
 					}
 					requestType.clear();
 				}

@@ -21,30 +21,33 @@ void Server::Controllers::MainController::run()
 
 	for (;;) {
 		std::cerr << "waiting for client to connect\n";
-
 		server.accept(_client.socket());
 		std::cerr << "client connected from " << _client.socket().local_endpoint() << lf;
 		_client << "Welcome to AvanSync server 1.0" << crlf;
+
 		for (;;) {
 			std::string request;
+
 			getline(_client, request);
+
 			request.erase(request.end() - 1); // remove '\r'
+
 			std::cerr << "client says: " << request << lf;
 
-			std::string cmd = "";
+			std::string command = "";
 			std::string rest = "";
 
 			try {
-				cmd = request.substr(0, request.find(" "));
+				command = request.substr(0, request.find(" "));
 			}
 			catch (const std::exception& e) {
 			}
 
-			if (cmd == "") {
-				cmd = request;
+			if (command == "") {
+				command = request;
 			}
 
-			processCommand(cmd, rest);
+			processCommand(command, rest);
 			_client << rest << crlf;
 			if (request == "disconnect") {
 				break;
@@ -76,7 +79,7 @@ void Controllers::MainController::processCommand(const std::string& command, std
 	else if (command == "MKDIR") {
 		_factory.get_command(Enums::CommandEnum::CREATE_DIRECTORY)->execute(_client, rest);
 	}
-	else if (command == "quit") {
+	else if (command == "QUIT") {
 		_factory.get_command(Enums::CommandEnum::DISCONNECT)->execute(_client);
 	}
 	else {

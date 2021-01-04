@@ -2,6 +2,8 @@
 #include <string>
 #include <memory>
 #include "../Operations/Operation.h"
+#include "../Operations/DirOperation.h"
+#include "../Operations/InfoOperation.h"
 #include <map>
 
 class OperationFactory {
@@ -11,4 +13,5 @@ private:
 public:
 	OperationFactory();
 	const std::shared_ptr<Operation> GetOperation(const std::string& operation);
+
 };

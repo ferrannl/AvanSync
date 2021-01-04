@@ -19,18 +19,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Operations\PutOperation.cpp" />
+    <ClCompile Include="src\Operations\GetOperation.cpp" />
+    <ClCompile Include="src\Operations\QuitOperation.cpp" />
+    <ClCompile Include="src\Operations\DelOperation.cpp" />
     <ClCompile Include="src\Operations\DirOperation.cpp" />
     <ClCompile Include="src\Operations\InfoOperation.cpp" />
     <ClCompile Include="src\Factories\OperationFactory.cpp" />
     <ClCompile Include="src\Controllers\MainController.cpp" />
     <ClCompile Include="src\Client.cpp" />
+    <ClCompile Include="src\Operations\SyncOperation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Operations\PutOperation.h" />
+    <ClInclude Include="src\Operations\GetOperation.h" />
+    <ClInclude Include="src\Operations\QuitOperation.h" />
+    <ClInclude Include="src\Operations\DelOperation.h" />
     <ClInclude Include="src\Operations\Operation.h" />
     <ClInclude Include="src\Operations\DirOperation.h" />
     <ClInclude Include="src\Operations\InfoOperation.h" />
     <ClInclude Include="src\Factories\OperationFactory.h" />
     <ClInclude Include="src\Controllers\MainController.h" />
+    <ClInclude Include="src\Operations\SyncOperation.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

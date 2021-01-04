@@ -1,5 +1,5 @@
 #pragma once
-#include "../Commands/Command.h"
+#include "Command.h"
 #include <chrono>
 #include <ctime>
 
@@ -11,7 +11,6 @@ namespace Server {
 			void execute(asio::ip::tcp::iostream& stream, std::string& path);
 
 		private:
-
 			template <typename TP>
 			std::time_t to_time_t(TP tp)
 			{

@@ -9,7 +9,7 @@ namespace Server {
 		public:
 			MainController();
 
-			void processCommand(const std::string&, std::string& = "");
+			void processCommand(const std::string&, std::string&);
 			void run();
 		private:
 			asio::ip::tcp::iostream _client;
