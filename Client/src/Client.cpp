@@ -73,26 +73,33 @@ void dir(std::string req, asio::ip::tcp::iostream& server)
 }
 
 void get(std::string req, asio::ip::tcp::iostream& server) {
+	//Ask for path
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
 	}
 	std::string result;
 	if (getline(server, result)) {
-		int iterations = std::stoi(result);
-		std::string byte;
-		std::string result_string;
-		for (int i = 0; i < iterations; ++i)
+		if (result == "Error: no such file \r")
 		{
-			if (getline(server, byte))
-			{
-				result_string += byte;
-				std::cout << byte << "\n";
-			}
+			server << result << "\n";
 		}
-		std::string client_path = "C:\\temp";
-		std::ofstream streamresult(client_path + "\\test.txt");
-		streamresult << result_string;
-		streamresult.close();
+		else {
+			int iterations = std::stoi(result);
+			std::string byte;
+			std::string result_string;
+			for (int i = 0; i < iterations; ++i)
+			{
+				if (getline(server, byte))
+				{
+					result_string += byte;
+					std::cout << byte << "\n";
+				}
+			}
+			std::string client_path = "C:\\temp\\client";
+			std::ofstream streamresult(client_path + "\\test.txt");
+			streamresult << result_string;
+			streamresult.close();
+		}
 	}
 }
 
@@ -153,6 +160,9 @@ int main() {
 					}
 					else if (req.find("get") == 0) {
 						get(req, server);
+					} else
+					{
+						
 					}
 				}
 			}

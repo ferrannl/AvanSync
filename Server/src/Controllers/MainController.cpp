@@ -83,7 +83,7 @@ void MainController::get_right_command(const std::string& command, asio::ip::tcp
 	}
 
 	else {
-		wrong_command();
+		client << "Invalid Command." << "\r\n";
 	}
 }
 
@@ -140,42 +140,63 @@ std::string MainController::dir(const std::string& path)
 	return dir_list;
 }
 
-std::string Controllers::MainController::get(const std::string& path)
+std::string MainController::get(const std::string& path)
 {
 	std::string return_list;
-	if (fs::exists(path)) {
-		return_list += std::to_string(fs::file_size(path)) + "\r\n";
-		std::string result;
-		std::ifstream streamresult(path);
-		//get length of file
-		streamresult.seekg(0, std::ios::end);
-		size_t length = streamresult.tellg();
-		streamresult.seekg(0, std::ios::beg);
-
-		char buffer[1000];
-		// don't overflow the buffer!
-
-		//read file
-		streamresult.read(buffer, length);
-		for (int i = 0; i < length; ++i)
-		{
-			return_list += buffer[i];
-			return_list += "\r\n";
-		}
+	if (!std::filesystem::exists(path)) {
+		return "Error: no such file \r\n";
 	}
-	return return_list;
+	return_list += std::to_string(fs::file_size(path)) + "\r\n";
+	std::string result;
+	std::ifstream streamresult(path);
+	//get length of file
+	streamresult.seekg(0, std::ios::end);
+	size_t length = streamresult.tellg();
+	streamresult.seekg(0, std::ios::beg);
+
+	char buffer[1000];
+	// don't overflow the buffer!
+
+	//read file
+	streamresult.read(buffer, length);
+	for (int i = 0; i < length; ++i)
+	{
+		return_list += buffer[i];
+		return_list += "\r\n";
+	}
+}
+
+std::string MainController::del(const std::string& path)
+{
+	if (!std::filesystem::exists(path)) {
+		return "Error: no such file or directory \r\n";
+	}
+
+	auto dir = std::filesystem::directory_entry(path);
+	auto per = dir.status().permissions();
+
+	if (per != std::filesystem::perms::all) {
+		return "Error: no permission \r\n";
+	}
+	std::filesystem::remove(path);
+	return "OK \r\n";
 }
 
 std::string MainController::put(const std::string& path, const std::string& file_size)
 {
-	if (fs::exists(path)) {
-		fs::copy(path, path);
-		return "OK";
+	if (!fs::exists(path)) {
+		return "Error: Invalid path \r\n";
 	}
-	else {
-		return "Error: Invalid path";
+	auto dir = std::filesystem::directory_entry(path);
+	auto per = dir.status().permissions();
+
+	if (per != std::filesystem::perms::all) {
+		return "Error: no permission \r\n";
 	}
+	fs::copy(path, path);
+	return "OK \r\n";
 }
+
 
 std::string MainController::ren(std::string& path, const std::string& new_name)
 {
@@ -195,22 +216,6 @@ std::string MainController::ren(std::string& path, const std::string& new_name)
 
 }
 
-std::string MainController::del(const std::string& path)
-{
-	if (!std::filesystem::exists(path)) {
-		return "Error: no such file or directory \r\n";
-	}
-
-	auto dir = std::filesystem::directory_entry(path);
-	auto per = dir.status().permissions();
-
-	if (per != std::filesystem::perms::all) {
-		return "Error: no permission \r\n";
-	}
-	std::filesystem::remove(path);
-	return "OK \r\n";
-}
-
 std::string MainController::mkdir(const std::string& parent, const std::string& name)
 {
 	if (fs::exists(parent)) {
@@ -223,15 +228,3 @@ std::string MainController::mkdir(const std::string& parent, const std::string& 
 		return "Error: no such directory \r\n";
 	}
 }
-
-void MainController::wrong_command()
-{
-	_responses.push_back("Invalid Command.");
-}
-
-std::vector<std::string> Controllers::MainController::get_responses()
-{
-	return _responses;
-}
-
-

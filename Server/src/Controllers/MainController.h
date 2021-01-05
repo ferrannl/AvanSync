@@ -20,7 +20,7 @@ namespace Controllers {
 		std::string del(const std::string& path);
 		std::string mkdir(const std::string& parent, const std::string& name);
 		std::string get(const std::string& path);
-		void wrong_command();
+		std::string wrong_command();
 		std::vector<std::string> get_responses();
 	};
 }
