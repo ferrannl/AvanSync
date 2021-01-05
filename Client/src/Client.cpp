@@ -7,6 +7,29 @@
 #include <fstream>
 namespace fs = std::filesystem;
 
+void info(std::string req, asio::ip::tcp::iostream& server) {
+	server << req << "\r\n";
+}
+
+void dir(std::string req, asio::ip::tcp::iostream& server)
+{
+	if (getline(std::cin, req)) {
+		server << req << "\r\n";
+	}
+	std::string result;
+	if (getline(server, result))
+	{
+		int iterations = std::stoi(result);
+		for (int i = 0; i < iterations; ++i)
+		{
+			if (getline(server, result))
+			{
+				std::cout << result << "\n";
+			}
+		}
+	}
+}
+
 void mkdir(std::string req, asio::ip::tcp::iostream& server) {
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
@@ -43,34 +66,6 @@ void del(std::string req, asio::ip::tcp::iostream& server) {
 	}
 }
 
-void quit(std::string req, asio::ip::tcp::iostream& server) {
-	server << req << "\r\n";
-	std::cerr << "will disconnect from client " << server.socket().local_endpoint() << "\n";
-
-}
-
-void info(std::string req, asio::ip::tcp::iostream& server) {
-	server << req << "\r\n";
-}
-
-void dir(std::string req, asio::ip::tcp::iostream& server)
-{
-	if (getline(std::cin, req)) {
-		server << req << "\r\n";
-	}
-	std::string result;
-	if (getline(server, result))
-	{
-		int iterations = std::stoi(result);
-		for (int i = 0; i < iterations; ++i)
-		{
-			if (getline(server, result))
-			{
-				std::cout << result << "\n";
-			}
-		}
-	}
-}
 
 void get(std::string req, asio::ip::tcp::iostream& server) {
 	//Ask for path
@@ -112,6 +107,12 @@ void put(std::string req, asio::ip::tcp::iostream& server) {
 			req += std::to_string(size);
 		}
 	}
+}
+
+void quit(std::string req, asio::ip::tcp::iostream& server) {
+	server << req << "\r\n";
+	std::cerr << "will disconnect from client " << server.socket().local_endpoint() << "\n";
+
 }
 
 int main() {
@@ -160,9 +161,10 @@ int main() {
 					}
 					else if (req.find("get") == 0) {
 						get(req, server);
-					} else
+					}
+					else
 					{
-						
+
 					}
 				}
 			}
