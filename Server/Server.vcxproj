@@ -36,6 +36,7 @@
     <ClInclude Include="src\Commands\DirSyncCommand.h" />
     <ClInclude Include="src\Enums\CommandEnum.h" />
     <ClInclude Include="src\Controllers\MainController.h" />
+    <ClInclude Include="src\Helpers\PathHelper.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

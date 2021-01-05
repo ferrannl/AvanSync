@@ -2,6 +2,7 @@
 #include "MainController.h"
 #include <sstream>
 #include <fstream>
+#include "../Helpers/PathHelper.h"
 
 using namespace Controllers;
 
@@ -43,9 +44,11 @@ void MainController::get_right_command(const std::string& command, asio::ip::tcp
 	else if (command.find("mkdir") == 0) {
 		std::string result;
 		std::string result2;
+		//Ask for parent dir
 		if (getline(client, result)) {
 			result.erase(result.end() - 1);
 		}
+		//Ask for name for new dir
 		if (getline(client, result2)) {
 			result2.erase(result2.end() - 1);
 		}
@@ -194,14 +197,18 @@ std::string MainController::ren(std::string& path, const std::string& new_name)
 
 std::string MainController::del(const std::string& path)
 {
-	if (std::filesystem::exists(path)) {
-		std::filesystem::remove(path);
-		return "OK \r\n";
-	}
-	else {
+	if (!std::filesystem::exists(path)) {
 		return "Error: no such file or directory \r\n";
 	}
 
+	auto dir = std::filesystem::directory_entry(path);
+	auto per = dir.status().permissions();
+
+	if (per != std::filesystem::perms::all) {
+		return "Error: no permission \r\n";
+	}
+	std::filesystem::remove(path);
+	return "OK \r\n";
 }
 
 std::string MainController::mkdir(const std::string& parent, const std::string& name)
