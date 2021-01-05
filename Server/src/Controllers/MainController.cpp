@@ -12,7 +12,6 @@ class WordDelimitedBy : public std::string
 
 void MainController::get_right_command(const std::string& command, asio::ip::tcp::iostream& client)
 {
-	_responses.clear();
 	if (command.find("info") == 0) {
 		std::string result;
 		if (getline(client, result)) {
