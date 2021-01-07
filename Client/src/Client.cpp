@@ -76,9 +76,15 @@ void get(std::string req, asio::ip::tcp::iostream& server) {
 	if (getline(server, result)) {
 		if (result == "Error: no such file \r")
 		{
-			server << result << "\n";
+			std::cout << result << "\n";
+		}
+		else if (result == "Error: no permission \r")
+		{
+			std::cout << result << "\n";
 		}
 		else {
+			std::uintmax_t size = std::filesystem::file_size(req);
+			std::cout << "File is " + std::to_string(size) + " bytes \r\n";
 			int iterations = std::stoi(result);
 			std::string byte;
 			std::string result_string;
@@ -90,8 +96,9 @@ void get(std::string req, asio::ip::tcp::iostream& server) {
 					std::cout << byte << "\n";
 				}
 			}
-			std::string client_path = "C:\\temp\\client";
-			std::ofstream streamresult(client_path + "\\test.txt");
+			std::string client_path = "C:\\temp\\client\\result";
+			std::ofstream streamresult(client_path + "\\result.txt");
+
 			streamresult << result_string;
 			streamresult.close();
 		}
@@ -100,12 +107,25 @@ void get(std::string req, asio::ip::tcp::iostream& server) {
 
 void put(std::string req, asio::ip::tcp::iostream& server) {
 	if (getline(std::cin, req)) {
-		std::string result = req.substr(4, req.length());
-		if (fs::exists(result)) {
-			float size = fs::file_size(result);
-			req += " ";
-			req += std::to_string(size);
+		server << req << "\r\n";
+		server << std::filesystem::file_size(req) << "r/n";
+		std::string result;
+		std::ifstream streamresult(req);
+		streamresult.seekg(0, std::ios::end);
+		size_t length = streamresult.tellg();
+		streamresult.seekg(0, std::ios::beg);
+
+		char buffer[1000];
+		streamresult.read(buffer, length);
+		for (int i = 0; i < length; ++i)
+		{
+			server << buffer[i] << "\r\n";
 		}
+	}
+	std::string end;
+	if (getline(server, end))
+	{
+		std::cout << end << "\n";
 	}
 }
 

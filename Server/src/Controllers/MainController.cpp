@@ -73,14 +73,8 @@ void MainController::get_right_command(const std::string& command, asio::ip::tcp
 		if (getline(client, result)) {
 			result2.erase(result2.end() - 1);
 		}
-		client << put(result, result2) << "\r\n";
-
-		/*std::istringstream iss(command);
-		std::vector<std::string> results((std::istream_iterator<WordDelimitedBy<' '>>(iss)),
-			std::istream_iterator<WordDelimitedBy<' '>>());
-		put(results[1]);*/
+		client << put(result, result2, client) << "\r\n";
 	}
-
 	else {
 		client << "Invalid Command." << "\r\n";
 	}
@@ -102,7 +96,6 @@ std::time_t to_time_t(const TP& tp)
 
 std::string MainController::dir(const std::string& path)
 {
-
 	std::string dir_list;
 	int counter = 0;
 	for (const auto& entry : fs::recursive_directory_iterator(path))
@@ -145,6 +138,12 @@ std::string MainController::get(const std::string& path)
 	if (!std::filesystem::exists(path)) {
 		return "Error: no such file \r\n";
 	}
+	auto dir = std::filesystem::directory_entry(path);
+	auto per = dir.status().permissions();
+
+	if (per != std::filesystem::perms::all) {
+		return "Error: no permission \r\n";
+	}
 	return_list += std::to_string(fs::file_size(path)) + "\r\n";
 	std::string result;
 	std::ifstream streamresult(path);
@@ -163,6 +162,7 @@ std::string MainController::get(const std::string& path)
 		return_list += buffer[i];
 		return_list += "\r\n";
 	}
+	return return_list;
 }
 
 std::string MainController::del(const std::string& path)
@@ -181,18 +181,37 @@ std::string MainController::del(const std::string& path)
 	return "OK \r\n";
 }
 
-std::string MainController::put(const std::string& path, const std::string& file_size)
+std::string MainController::put(const std::string& path, const std::string& file_size, asio::ip::tcp::iostream& client)
 {
-	if (!fs::exists(path)) {
-		return "Error: Invalid path \r\n";
-	}
-	auto dir = std::filesystem::directory_entry(path);
-	auto per = dir.status().permissions();
+	//if (!fs::exists(path)) {
+	//	return "Error: Invalid path \r\n";
+	//}
+	//auto dir = std::filesystem::directory_entry(path);
+	//auto per = dir.status().permissions();
 
-	if (per != std::filesystem::perms::all) {
-		return "Error: no permission \r\n";
+	//if (per != std::filesystem::perms::all) {
+	//	return "Error: no permission \r\n";
+	//}
+
+	std::string result = path;
+	std::reverse(result.begin(), result.end());
+	std::string old_name = result.substr(0, result.find("/"));
+	std::reverse(old_name.begin(), old_name.end());
+	std::string bytes;
+	std::string result_string;
+	int file_size_int = std::stoi(file_size);
+	for (int i = 0; i < file_size_int; ++i)
+	{
+		if (getline(client, bytes))
+		{
+			bytes.erase((bytes.end() - 1));
+			result_string += bytes;
+		}
 	}
-	fs::copy(path, path);
+	std::string server_path = _path + old_name;
+	std::ofstream streamresult(server_path);
+	streamresult << result_string;
+	streamresult.close();
 	return "OK \r\n";
 }
 
