@@ -70,8 +70,7 @@ void MainController::get_right_command(const std::string& command, asio::ip::tcp
 		if (getline(client, result)) {
 			result.erase(result.end() - 1);
 		}
-		if (getline(client, result)) {
-			result2.erase(result2.end() - 1);
+		if (getline(client, result2)) {
 		}
 		client << put(result, result2, client) << "\r\n";
 	}
@@ -183,36 +182,26 @@ std::string MainController::del(const std::string& path)
 
 std::string MainController::put(const std::string& path, const std::string& file_size, asio::ip::tcp::iostream& client)
 {
-	//if (!fs::exists(path)) {
-	//	return "Error: Invalid path \r\n";
-	//}
-	//auto dir = std::filesystem::directory_entry(path);
-	//auto per = dir.status().permissions();
-
-	//if (per != std::filesystem::perms::all) {
-	//	return "Error: no permission \r\n";
-	//}
-
 	std::string result = path;
 	std::reverse(result.begin(), result.end());
 	std::string old_name = result.substr(0, result.find("/"));
 	std::reverse(old_name.begin(), old_name.end());
-	std::string bytes;
+	std::string byte;
 	std::string result_string;
 	int file_size_int = std::stoi(file_size);
 	for (int i = 0; i < file_size_int; ++i)
 	{
-		if (getline(client, bytes))
+		if (getline(client, byte))
 		{
-			bytes.erase((bytes.end() - 1));
-			result_string += bytes;
+			byte.erase(byte.end() - 1);
+			result_string += byte;
 		}
 	}
 	std::string server_path = _path + old_name;
 	std::ofstream streamresult(server_path);
 	streamresult << result_string;
 	streamresult.close();
-	return "OK \r\n";
+	return "OK! \r\n";
 }
 
 

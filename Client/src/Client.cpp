@@ -92,6 +92,7 @@ void get(std::string req, asio::ip::tcp::iostream& server) {
 			{
 				if (getline(server, byte))
 				{
+					byte = byte.substr(0, 1);
 					result_string += byte;
 					std::cout << byte << "\n";
 				}
@@ -108,14 +109,18 @@ void get(std::string req, asio::ip::tcp::iostream& server) {
 void put(std::string req, asio::ip::tcp::iostream& server) {
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
-		server << std::filesystem::file_size(req) << "r/n";
+		server << fs::file_size(req) << "\r\n";
 		std::string result;
 		std::ifstream streamresult(req);
+		//get length of file
 		streamresult.seekg(0, std::ios::end);
 		size_t length = streamresult.tellg();
 		streamresult.seekg(0, std::ios::beg);
 
 		char buffer[1000];
+		// don't overflow the buffer!
+
+		//read file
 		streamresult.read(buffer, length);
 		for (int i = 0; i < length; ++i)
 		{
@@ -123,8 +128,7 @@ void put(std::string req, asio::ip::tcp::iostream& server) {
 		}
 	}
 	std::string end;
-	if (getline(server, end))
-	{
+	if (getline(server, end)) {
 		std::cout << end << "\n";
 	}
 }
