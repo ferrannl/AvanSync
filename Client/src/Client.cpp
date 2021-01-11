@@ -7,12 +7,14 @@
 #include <fstream>
 namespace fs = std::filesystem;
 
-void info(std::string req, asio::ip::tcp::iostream& server) {
+void info(const std::string& req, asio::ip::tcp::iostream& server) {
+
 	server << req << "\r\n";
 }
 
-void dir(std::string req, asio::ip::tcp::iostream& server)
+void dir(asio::ip::tcp::iostream& server)
 {
+	std::string req;
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
 	}
@@ -30,7 +32,9 @@ void dir(std::string req, asio::ip::tcp::iostream& server)
 	}
 }
 
-void mkdir(std::string req, asio::ip::tcp::iostream& server) {
+void mkdir(asio::ip::tcp::iostream& server) {
+	std::string req;
+
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
 	}
@@ -43,7 +47,9 @@ void mkdir(std::string req, asio::ip::tcp::iostream& server) {
 	}
 }
 
-void ren(std::string req, asio::ip::tcp::iostream& server) {
+void ren(asio::ip::tcp::iostream& server) {
+	std::string req;
+
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
 	}
@@ -56,7 +62,8 @@ void ren(std::string req, asio::ip::tcp::iostream& server) {
 	}
 }
 
-void del(std::string req, asio::ip::tcp::iostream& server) {
+void del(asio::ip::tcp::iostream& server) {
+	std::string req;
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
 	}
@@ -66,9 +73,10 @@ void del(std::string req, asio::ip::tcp::iostream& server) {
 	}
 }
 
-
-void get(std::string req, asio::ip::tcp::iostream& server) {
+void get(asio::ip::tcp::iostream& server) {
 	//Ask for path
+	std::string req;
+
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
 	}
@@ -106,7 +114,8 @@ void get(std::string req, asio::ip::tcp::iostream& server) {
 	}
 }
 
-void put(std::string req, asio::ip::tcp::iostream& server) {
+void put(asio::ip::tcp::iostream& server) {
+	std::string req;
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
 		server << fs::file_size(req) << "\r\n";
@@ -133,10 +142,8 @@ void put(std::string req, asio::ip::tcp::iostream& server) {
 	}
 }
 
-void quit(std::string req, asio::ip::tcp::iostream& server) {
+void quit(const std::string& req, asio::ip::tcp::iostream& server) {
 	server << req << "\r\n";
-	std::cerr << "will disconnect from client " << server.socket().local_endpoint() << "\n";
-
 }
 
 int main() {
@@ -163,28 +170,28 @@ int main() {
 					server << req << crlf;
 					if (req.find("dir") == 0)
 					{
-						dir(req, server);
+						dir(server);
 					}
 					else if (req.find("del") == 0) {
-						del(req, server);
+						del(server);
 					}
 					else if (req.find("info") == 0) {
 						info(req, server);
 					}
 					else if (req.find("mkdir") == 0) {
-						mkdir(req, server);
+						mkdir(server);
 					}
 					else if (req.find("ren") == 0) {
-						ren(req, server);
+						ren(server);
 					}
 					else if (req.find("quit") == 0) {
 						quit(req, server);
 					}
 					else if (req.find("put") == 0) {
-						put(req, server);
+						put(server);
 					}
 					else if (req.find("get") == 0) {
-						get(req, server);
+						get(server);
 					}
 					else
 					{

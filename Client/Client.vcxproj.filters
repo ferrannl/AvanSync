@@ -18,14 +18,8 @@
     <ClCompile Include="src\Client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Controllers\MainController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Controllers\MainController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Factories\OperationFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>

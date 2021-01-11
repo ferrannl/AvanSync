@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Client.cpp" />
-    <ClCompile Include="src\Controllers\MainController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Operations\PutOperation.h" />
@@ -31,7 +30,6 @@
     <ClInclude Include="src\Operations\DirOperation.h" />
     <ClInclude Include="src\Operations\InfoOperation.h" />
     <ClInclude Include="src\Factories\OperationFactory.h" />
-    <ClInclude Include="src\Controllers\MainController.h" />
     <ClInclude Include="src\Operations\SyncOperation.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

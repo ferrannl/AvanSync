@@ -74,6 +74,10 @@ void MainController::get_right_command(const std::string& command, asio::ip::tcp
 		}
 		client << put(result, result2, client) << "\r\n";
 	}
+	else if (command.find("quit") == 0)
+	{
+		std::cerr << "will disconnect from client" << client.socket().local_endpoint() << "\r\n";
+	}
 	else {
 		client << "Invalid Command." << "\r\n";
 	}
@@ -205,16 +209,17 @@ std::string MainController::put(const std::string& path, const std::string& file
 }
 
 
-std::string MainController::ren(std::string& path, const std::string& new_name)
+std::string MainController::ren(const std::string& path, const std::string& new_name)
 {
-	if (std::filesystem::exists(path)) {
-		std::string old_path = path;
-		std::reverse(path.begin(), path.end());
-		std::string end = path.substr(0, path.find("/"));
-		path.erase(0, end.length());
-		std::reverse(path.begin(), path.end());
-		path += new_name;
-		std::filesystem::rename(old_path, path);
+	std::string path2 = path;
+	if (std::filesystem::exists(path2)) {
+		std::string old_path = path2;
+		std::reverse(path2.begin(), path2.end());
+		std::string end = path2.substr(0, path2.find("/"));
+		path2.erase(0, end.length());
+		std::reverse(path2.begin(), path2.end());
+		path2 += new_name;
+		std::filesystem::rename(old_path, path2);
 		return "OK \r\n";
 	}
 	else {
