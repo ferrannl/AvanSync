@@ -218,6 +218,16 @@ std::string MainController::put(const std::string& path, const std::string& file
 
 std::string MainController::ren(const std::string& path, const std::string& new_name)
 {
+	if (!std::filesystem::exists(path)) {
+		return "Error: no such file or directory \r\n";
+	}
+
+	auto dir = std::filesystem::directory_entry(path);
+	auto per = dir.status().permissions();
+
+	if (per != std::filesystem::perms::all) {
+		return "Error: no permission \r\n";
+	}
 	std::string path2 = path;
 	if (std::filesystem::exists(path2)) {
 		std::string old_path = path2;
