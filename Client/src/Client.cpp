@@ -90,7 +90,17 @@ void del(asio::ip::tcp::iostream& server) {
 	}
 	std::string result;
 	if (getline(server, result)) {
-		std::cout << result + "\n";
+		if (result == "Error: no such file or directory \r")
+		{
+			std::cout << result << "\n";
+		}
+		else if (result == "Error: no permission \r")
+		{
+			std::cout << result << "\n";
+		}
+		else {
+			std::cout << result + "\n";
+		}
 	}
 }
 
