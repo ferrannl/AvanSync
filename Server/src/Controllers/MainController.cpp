@@ -30,7 +30,7 @@ void MainController::get_right_command(const std::string& command, asio::ip::tcp
 		std::string result;
 		if (getline(client, result)) {
 			result.erase(result.end() - 1);
-			client << get(result) << "\r\n";
+			client << get(result, client) << "\r\n";
 		}
 	}
 	else if (command.find("del") == 0) {
@@ -135,35 +135,34 @@ std::string MainController::dir(const std::string& path)
 	return dir_list;
 }
 
-std::string MainController::get(const std::string& path)
+std::string MainController::get(const std::string& path, asio::ip::tcp::iostream& client)
 {
 	std::string return_list;
-	if (!std::filesystem::exists(path)) {
-		return "Error: no such file \r\n";
-	}
-	auto dir = std::filesystem::directory_entry(path);
-	auto per = dir.status().permissions();
-
-	if (per != std::filesystem::perms::all) {
+	if (fs::status(path).permissions() != fs::perms::all) {
 		return "Error: no permission \r\n";
 	}
-	return_list += std::to_string(fs::file_size(path)) + "\r\n";
-	std::string result;
-	std::ifstream streamresult(path);
-	//get length of file
-	streamresult.seekg(0, std::ios::end);
-	size_t length = streamresult.tellg();
-	streamresult.seekg(0, std::ios::beg);
+	if (fs::exists(path)) {
+		std::string result;
+		client << std::to_string(fs::file_size(path)) + "\r\n";
+		std::ifstream streamresult(path, std::ios::binary);
+		//get length of file
+		streamresult.seekg(0, std::ios::end);
+		size_t length = streamresult.tellg();
+		streamresult.seekg(0, std::ios::beg);
 
-	char buffer[1000];
-	// don't overflow the buffer!
+		char buffer[100000];
+		// don't overflow the buffer!
 
-	//read file
-	streamresult.read(buffer, length);
-	for (int i = 0; i < length; ++i)
-	{
-		return_list += buffer[i];
-		return_list += "\r\n";
+		//read file
+		streamresult.read(buffer, length);
+		for (int i = 0; i < length; ++i)
+		{
+			result += buffer[i];
+		}
+		client.write(result.c_str(), length);
+	}
+	else {
+		return "Error: no such file \r\n";
 	}
 	return return_list;
 }
@@ -239,4 +238,8 @@ std::string MainController::mkdir(const std::string& parent, const std::string& 
 	else {
 		return "Error: no such directory \r\n";
 	}
+}
+void MainController::sync(asio::ip::tcp::iostream& server)
+{
+
 }
