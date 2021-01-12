@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -84,16 +85,13 @@ void del(asio::ip::tcp::iostream& server) {
 }
 
 void get(asio::ip::tcp::iostream& server) {
-	std::string client_path = "C:\\temp\\client\\result";
-	std::ofstream streamresult(client_path + "\\result");
+	std::string client_path = "C:\\temp\\client\\result\\";
 	std::string req;
-	if (getline(std::cin, req))
-	{
+	if (getline(std::cin, req)) {
 		server << req << "\r\n";
 	}
 	std::string result;
-	if (getline(server, result))
-	{
+	if (getline(server, result)) {
 		if (result == "Error: no such file \r")
 		{
 			std::cout << result << "\n";
@@ -108,14 +106,13 @@ void get(asio::ip::tcp::iostream& server) {
 			std::string byte;
 			char* bytes = new char[iterations];
 			server.read(bytes, iterations);
-
-			std::ofstream streamresult(client_path + fs::path(req).filename().string(), std::ofstream::binary);
-			for (int i = 0; i < iterations; ++i)
-			{
+			for (int i = 0; i < iterations; i++) {
 				std::cout << bytes[i] << "\n";
 			}
+			std::ofstream streamresult(client_path + fs::path(req).filename().string(), std::ofstream::binary);
+			streamresult.write(bytes, iterations);
+			streamresult.close();
 		}
-		streamresult.close();
 	}
 }
 //Ask for path
@@ -166,7 +163,7 @@ void put(asio::ip::tcp::iostream& server) {
 		size_t length = streamresult.tellg();
 		streamresult.seekg(0, std::ios::beg);
 
-		char buffer[1000];
+		char buffer[100000];
 		// don't overflow the buffer!
 
 		//read file
@@ -183,101 +180,99 @@ void put(asio::ip::tcp::iostream& server) {
 }
 
 void sync(asio::ip::tcp::iostream& server) {
-	//std::string _path_server = "C:\\temp\\server\\";
-	//std::string _path_client = "C:\\temp\\client\\";
+	std::string _path_server = "C:\\temp\\server\\";
+	std::string _path_client = "C:\\temp\\client\\";
 
-	//server << "dir" << "\r\n";
-	//server << _path_server << "\r\n";
-	//std::string result;
-	//std::vector<std::map<std::string, std::string>> paths = {};
-	//if (getline(server, result))
-	//{
-	//	const int iterations = std::stoi(result);
-	//	for (int i = 0; i < iterations; ++i)
-	//	{
-	//		if (getline(server, result))
-	//		{
-	//			std::string seg;
-	//			result.erase(result.end() - 1);
-	//			std::stringstream str(result);
-	//			std::map<std::string, std::string> map;
-	//			int counter = 0;
-	//			while (std::getline(str, seg, '|'))
-	//			{
-	//				switch (counter)
-	//				{
-	//				case 0:
-	//					map["isdir"] = seg;
-	//					++counter;
-	//					break;
-	//				case 1:
-	//					map["filename"] = seg;
-	//					++counter;
-	//					break;
-	//				case 2:
-	//					map["last_modified"] = seg;
-	//					++counter;
-	//					break;
-	//				case 3:
-	//					map["filesize"] = seg;
-	//					++counter;
-	//					break;
-	//				}
-	//			}
-	//			paths.push_back(map);
-	//		}
-	//	}
-	//	int counter_client = { 0 };
-	//	int counter_server = { 0 };
-	//	for (const auto& entry : fs::recursive_directory_iterator(_path_client))
-	//	{
-	//		bool found = true;
-	//		if (!paths.empty()) {
-	//			counter_server = 0;
-	//			for (auto& map : paths) {
-	//				auto test = fs::last_write_time(entry.path());
-	//				std::time_t tt = to_time_t(test);
-	//				std::tm* gmt = std::localtime(&tt);
-	//				std::stringstream buffer;
-	//				buffer << std::put_time(gmt, "&F &T");
-	//				if (buffer.str() > map["last_written"]) {
-	//					sync_with_server(server, entry);
-	//				}
-	//				if (fs::path(entry.path()).filename().string() != map["filename"])
-	//				{
-	//					sync_with_server(server, entry);
-	//				}
-	//				++counter_server;
-	//			}
-	//		}
-	//		else
-	//		{
-	//			sync_with_server(server, entry);
-	//		}
-	//		++counter_client;
-	//	}
-	//	std::vector <std::string> entry_names = {};
-	//	std::vector <std::string> client_names = {};
-	//	if (counter_server > counter_client)
-	//	{
-	//		for (const auto& entry : fs::recursive_directory_iterator(_path_client))
-	//		{
-	//			entry_names.push_back(fs::path(entry.path().filename().string()));
-	//		}
-	//		for (auto& map_entry : map)
-	//		{
-	//			client_names.push_back(map_entry["filename"]);
-	//		}
-	//		for (int i = 0; i < client_names.size(); ++i)
-	//		{
-	//			server << "del" << "\r\n";
-	//			server << server_path + server_names.at(i) << "\r\n";
-	//		}
-	//	}
-	//}
+	server << "dir" << "\r\n";
+	server << _path_server << "\r\n";
+	std::string result;
+	std::vector<std::map<std::string, std::string>> paths = {};
+	if (getline(server, result))
+	{
+		const int iterations = std::stoi(result);
+		for (int i = 0; i < iterations; ++i)
+		{
+			if (getline(server, result))
+			{
+				std::string seg;
+				result.erase(result.end() - 1);
+				std::stringstream str(result);
+				std::map<std::string, std::string> map;
+				int counter = 0;
+				while (std::getline(str, seg, '|'))
+				{
+					switch (counter)
+					{
+					case 0:
+						map["isdir"] = seg;
+						++counter;
+						break;
+					case 1:
+						map["filename"] = seg;
+						++counter;
+						break;
+					case 2:
+						map["last_modified"] = seg;
+						++counter;
+						break;
+					case 3:
+						map["filesize"] = seg;
+						++counter;
+						break;
+					}
+				}
+				paths.push_back(map);
+			}
+		}
+		std::vector<std::string> _files;
+		for (auto& p : fs::directory_iterator(_path_client))
+		{
+			auto test = fs::last_write_time(p.path());
+			std::time_t tt = to_time_t(test);
+			std::tm* gmt = std::localtime(&tt);
+			std::stringstream buffer;
+			buffer << std::put_time(gmt, "%F %T");
+			bool exists_in_server = false;
+			bool newer_version = false;
+			for (auto& file : paths)
+			{
+				if (p.path().filename() == file["filename"])
+				{
+					exists_in_server = true;
+					file["exists"] = "true";
+					if (buffer.str() > file["writetime"])
+					{
+						newer_version = true;
+					}
+				}
+
+			}
+			if (!exists_in_server || newer_version)
+			{
+				std::string path = _path_server + p.path().string().substr(_path_client.length(), p.path().string().length());
+				server << "put" << "\r\n";
+				server << path << "\r\n";
+				server << p.file_size() << "\r\n";
+				char* buffer = new char[p.file_size()];
+				std::ifstream input(p.path(), std::ios::binary);
+				input.read(buffer, p.file_size());
+				server.write(buffer, p.file_size());
+			}
+		}
+		for (auto& file : paths)
+		{
+			if (file["exists"] != "true")
+			{
+				std::string path = _path_server + file["filename"];
+				server << "del" << "\r\n";
+				server << path << "\r\n";
+			}
+		}
+	}
 }
 
-void sync_with_server(std::string req, int bytes, asio::ip::tcp::iostream& server)
+
+void sync_to_server(std::string req, int bytes, asio::ip::tcp::iostream& server)
 {
 	std::ifstream stream(req, std::ios::binary);
 	char* buffer = new char[bytes];

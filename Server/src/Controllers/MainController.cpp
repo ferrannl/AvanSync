@@ -138,10 +138,10 @@ std::string MainController::dir(const std::string& path)
 std::string MainController::get(const std::string& path, asio::ip::tcp::iostream& client)
 {
 	std::string return_list;
-	if (fs::status(path).permissions() != fs::perms::all) {
-		return "Error: no permission \r\n";
-	}
 	if (fs::exists(path)) {
+		if (fs::status(path).permissions() != fs::perms::all) {
+			return "Error: no permission \r\n";
+		}
 		std::string result;
 		client << std::to_string(fs::file_size(path)) + "\r\n";
 		std::ifstream streamresult(path, std::ios::binary);
