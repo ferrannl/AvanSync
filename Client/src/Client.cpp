@@ -32,12 +32,22 @@ void dir(asio::ip::tcp::iostream& server)
 	std::string result;
 	if (getline(server, result))
 	{
-		const int iterations = std::stoi(result);
-		for (int i = 0; i < iterations; ++i)
+		if (result == "Error: no such file \r")
 		{
-			if (getline(server, result))
+			std::cout << result << "\n";
+		}
+		else if (result == "Error: no permission \r")
+		{
+			std::cout << result << "\n";
+		}
+		else {
+			const int iterations = std::stoi(result);
+			for (int i = 0; i < iterations; ++i)
 			{
-				std::cout << result << "\n";
+				if (getline(server, result))
+				{
+					std::cout << result << "\n";
+				}
 			}
 		}
 	}
@@ -151,8 +161,7 @@ void get(asio::ip::tcp::iostream& server) {
 //	}
 //}
 
-void put(asio::ip::tcp::iostream& server) {
-	std::string req;
+void put(std::string req, asio::ip::tcp::iostream& server) {
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
 		server << fs::file_size(req) << "\r\n";
@@ -163,7 +172,7 @@ void put(asio::ip::tcp::iostream& server) {
 		size_t length = streamresult.tellg();
 		streamresult.seekg(0, std::ios::beg);
 
-		char buffer[100000];
+		char buffer[1000];
 		// don't overflow the buffer!
 
 		//read file
@@ -178,6 +187,34 @@ void put(asio::ip::tcp::iostream& server) {
 		std::cout << end << "\n";
 	}
 }
+
+//void put(asio::ip::tcp::iostream& server) {
+//	std::string req;
+//	if (getline(std::cin, req)) {
+//		server << req << "\r\n";
+//		server << fs::file_size(req) << "\r\n";
+//		std::string result;
+//		std::ifstream streamresult(req);
+//		//get length of file
+//		streamresult.seekg(0, std::ios::end);
+//		size_t length = streamresult.tellg();
+//		streamresult.seekg(0, std::ios::beg);
+//
+//		// don't overflow the buffer!
+//		char buffer[100000];
+//
+//		//read file
+//		streamresult.read(buffer, length);
+//		for (int i = 0; i < length; ++i)
+//		{
+//			server << buffer[i] << "\r\n";
+//		}
+//	std::string end;
+//	if (getline(server, end)) {
+//		std::cout << end << "\n";
+//	}
+//	}
+//}
 
 void sync(asio::ip::tcp::iostream& server) {
 	std::string _path_server = "C:\\temp\\server\\";
@@ -340,7 +377,7 @@ int main() {
 						quit(req, server);
 					}
 					else if (req.find("put") == 0) {
-						put(server);
+						put(req, server);
 					}
 					else if (req.find("get") == 0) {
 						get(server);

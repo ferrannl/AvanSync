@@ -100,38 +100,46 @@ std::time_t to_time_t(const TP& tp)
 std::string MainController::dir(const std::string& path)
 {
 	std::string dir_list;
-	int counter = 0;
-	for (const auto& entry : fs::recursive_directory_iterator(path))
-	{
-		++counter;
+	if (!fs::exists(path)) {
+		return "Error: no such file \r\n";
 	}
-	dir_list += std::to_string(counter) + "\r\n";
-	for (const auto& entry : fs::recursive_directory_iterator(path)) {
-
-		if (entry.is_directory())
-		{
-			dir_list += "D|";
-		}
-		else if (entry.is_regular_file())
-		{
-			dir_list += "F|";
+		if (fs::status(path).permissions() != fs::perms::all) {
+			return "Error: no permission \r\n";
 		}
 		else {
-			dir_list += "|";
+			int counter = 0;
+			for (const auto& entry : fs::recursive_directory_iterator(path))
+			{
+				++counter;
+			}
+			dir_list += std::to_string(counter) + "\r\n";
+			for (const auto& entry : fs::recursive_directory_iterator(path)) {
+
+				if (entry.is_directory())
+				{
+					dir_list += "D|";
+				}
+				else if (entry.is_regular_file())
+				{
+					dir_list += "F|";
+				}
+				else {
+					dir_list += "|";
+				}
+				dir_list += fs::path(entry.path()).filename().string();
+				dir_list += "|";
+				auto test = fs::last_write_time(entry.path());
+				std::time_t tt = to_time_t(test);
+				std::tm* gmt = std::localtime(&tt);
+				std::stringstream buffer;
+				buffer << std::put_time(gmt, "%F %T");
+				dir_list += buffer.str();
+				dir_list += "|";
+				dir_list += static_cast<std::stringstream>(std::stringstream() << entry.file_size()).str();
+				dir_list += " ";
+				dir_list += "\r\n";
+			}
 		}
-		dir_list += fs::path(entry.path()).filename().string();
-		dir_list += "|";
-		auto test = fs::last_write_time(entry.path());
-		std::time_t tt = to_time_t(test);
-		std::tm* gmt = std::localtime(&tt);
-		std::stringstream buffer;
-		buffer << std::put_time(gmt, "%F %T");
-		dir_list += buffer.str();
-		dir_list += "|";
-		dir_list += static_cast<std::stringstream>(std::stringstream() << entry.file_size()).str();
-		dir_list += " ";
-		dir_list += "\r\n";
-	}
 	return dir_list;
 }
 
