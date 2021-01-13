@@ -226,6 +226,37 @@ void put(std::string req, asio::ip::tcp::iostream& server) {
 //	}
 //}
 
+void write_to_server(std::string req, int bytes, asio::ip::tcp::iostream& server)
+{
+	std::ifstream stream(req, std::ios::binary);
+	char* buffer = new char[bytes];
+	stream.read(buffer, bytes);
+	server.write(buffer, bytes);
+
+	//std::string _path_server = "C:\\temp\\server\\";
+	//std::string _path_client = "C:\\temp\\client\\";
+	//server << "put" << "\r\n";
+	//server << _path_server + entry.path().filename().string() << "\r\n";
+	//std::ifstream stream(_path_client + entry.path().filename().string(), std::ios::binary);
+	//int file_size = fs::file_size(fs::path(_path_client + entry.path().filename().string()));
+
+	//server << fs::file_size(fs::path(_path_client + entry.path().filename().string())) << "\r\n";
+	//stream.read(buffer, file_size);
+}
+
+void sync_to_server(asio::ip::tcp::iostream& server, const std::filesystem::directory_entry& entry)
+{
+	std::string _path_server = "C:\\temp\\server\\";
+	std::string _path_client = "C:\\temp\\client\\";
+
+	server << "put" << "\r\n";
+	server << entry.path().filename().string() << "\r\n";
+	int bytes = fs::file_size(fs::path(_path_client + entry.path().filename().string()));
+	server << fs::file_size(fs::path(_path_client + entry.path().filename().string())) << "\r\n";
+
+	write_to_server(_path_client + entry.path().filename().string(), bytes, server);
+}
+
 void sync(asio::ip::tcp::iostream& server) {
 	std::string _path_server = "C:\\temp\\server\\";
 	std::string _path_client = "C:\\temp\\client\\";
@@ -272,7 +303,7 @@ void sync(asio::ip::tcp::iostream& server) {
 			}
 		}
 		std::vector<std::string> _files;
-		for (auto& p : fs::directory_iterator(_path_client))
+		for (const auto& p : fs::recursive_directory_iterator(_path_client))
 		{
 			auto test = fs::last_write_time(p.path());
 			std::time_t tt = to_time_t(test);
@@ -283,7 +314,7 @@ void sync(asio::ip::tcp::iostream& server) {
 			bool newer_version = false;
 			for (auto& file : paths)
 			{
-				if (p.path().filename() == file["filename"])
+				if (fs::path(p).filename() == file["filename"])
 				{
 					exists_in_server = true;
 					file["exists"] = "true";
@@ -292,23 +323,19 @@ void sync(asio::ip::tcp::iostream& server) {
 						newer_version = true;
 					}
 				}
-
 			}
 			if (!exists_in_server || newer_version)
 			{
-				if (entry.is_directory)
+				if (p.is_directory())
 				{
 					server << "mkdir" << "\r\n";
-					server << entry.path() << "\r\n";
+					server << p.path() << "\r\n";
+					server << p.path().filename().string() << "\r\n";
 				}
-				std::string path = _path_server + p.path().string().substr(_path_client.length(), p.path().string().length());
-				server << "put" << "\r\n";
-				server << path << "\r\n";
-				server << p.file_size() << "\r\n";
-				char* buffer = new char[p.file_size()];
-				std::ifstream input(p.path(), std::ios::binary);
-				input.read(buffer, p.file_size());
-				server.write(buffer, p.file_size());
+				else
+				{
+					sync_to_server(server, p);
+				}
 			}
 		}
 		for (auto& file : paths)
@@ -321,37 +348,6 @@ void sync(asio::ip::tcp::iostream& server) {
 			}
 		}
 	}
-}
-
-void write_to_server(std::string req, int bytes, asio::ip::tcp::iostream& server)
-{
-	std::ifstream stream(req, std::ios::binary);
-	char* buffer = new char[bytes];
-	stream.read(buffer, bytes);
-	server.write(buffer, bytes);
-
-	//std::string _path_server = "C:\\temp\\server\\";
-	//std::string _path_client = "C:\\temp\\client\\";
-	//server << "put" << "\r\n";
-	//server << _path_server + entry.path().filename().string() << "\r\n";
-	//std::ifstream stream(_path_client + entry.path().filename().string(), std::ios::binary);
-	//int file_size = fs::file_size(fs::path(_path_client + entry.path().filename().string()));
-
-	//server << fs::file_size(fs::path(_path_client + entry.path().filename().string())) << "\r\n";
-	//stream.read(buffer, file_size);
-}
-
-void sync_to_server(asio::ip::tcp::iostream& server, const std::filesystem::directory_entry& entry)
-{
-	std::string _path_server = "C:\\temp\\server\\";
-	std::string _path_client = "C:\\temp\\client\\";
-
-	server << "put" << "\r\n";
-	server << entry.path().filename().string() << "\r\n";
-	int bytes = fs::file_size(fs::path(_path_client + entry.path().filename().string()));
-	server << fs::file_size(fs::path(_path_client + entry.path().filename().string())) << "\r\n";
-
-	write_to_server(_path_client + entry.path().filename().string(), bytes, server);
 }
 
 void quit(const std::string& req, asio::ip::tcp::iostream& server) {

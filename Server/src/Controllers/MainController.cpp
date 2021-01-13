@@ -193,24 +193,26 @@ std::string MainController::del(const std::string& path)
 
 std::string MainController::put(const std::string& path, const std::string& file_size, asio::ip::tcp::iostream& client)
 {
+	if (!std::filesystem::exists(path)) {
+		return "Error: no such file \r\n";
+	}
+	auto dir = std::filesystem::directory_entry(path);
+	auto per = dir.status().permissions();
+
+	if (per != std::filesystem::perms::all) {
+		return "Error: no permission \r\n";
+	}
 	std::string result = path;
 	std::reverse(result.begin(), result.end());
 	std::string old_name = result.substr(0, result.find("/"));
 	std::reverse(old_name.begin(), old_name.end());
-	std::string byte;
 	std::string result_string;
 	int file_size_int = std::stoi(file_size);
-	for (int i = 0; i < file_size_int; ++i)
-	{
-		if (getline(client, byte))
-		{
-			byte.erase(byte.end() - 1);
-			result_string += byte;
-		}
-	}
+	char* bytes = new char[file_size_int];
+	client.read(bytes, file_size_int);
 	std::string server_path = _path + old_name;
-	std::ofstream streamresult(server_path);
-	streamresult << result_string;
+	std::ofstream streamresult(server_path, std::ios::binary);
+	streamresult.write(bytes, file_size_int);
 	streamresult.close();
 	return "OK! \r\n";
 }
