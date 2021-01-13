@@ -109,7 +109,7 @@ void get(asio::ip::tcp::iostream& server) {
 			std::cout << result << "\n";
 		}
 		else {
-			int iterations = std::stoi(result);
+			const int iterations = std::stoi(result);
 			std::cout << iterations << "\n";
 			std::string byte;
 			const std::shared_ptr<char> bytes(new char[iterations], std::default_delete<char[]>());
@@ -136,6 +136,7 @@ void put(asio::ip::tcp::iostream& server) {
 		if (result.rfind("Error:", 0) == 0)
 		{
 			std::cout << result << "\n";
+			return;
 		}
 		else {
 			server << result << "\r\n";
@@ -156,7 +157,6 @@ void put(asio::ip::tcp::iostream& server) {
 				return;
 			}
 		}
-
 	}
 }
 
@@ -234,7 +234,7 @@ void sync(asio::ip::tcp::iostream& server) {
 		std::time_t tt = to_time_t(test);
 		std::tm* gmt = std::localtime(&tt);
 		std::stringstream buffer;
-		buffer << std::put_time(gmt, "%F %T");
+		buffer << std::put_time(std::localtime(&tt), "%Y-%m-%d %H:%M:%S");
 		bool exists_in_server = false;
 		bool newer_version = false;
 		for (auto& file : dirs)
@@ -256,10 +256,10 @@ void sync(asio::ip::tcp::iostream& server) {
 			server << "put" << "\r\n";
 			server << path << "\r\n";
 			server << p.file_size() << "\r\n";
-			const std::shared_ptr<char> buffer(new char[p.file_size()], std::default_delete<char[]>());
+			char* buffer = new char[p.file_size()];
 			std::ifstream input(p.path(), std::ios::binary);
-			input.read(buffer.get(), p.file_size());
-			server.write(buffer.get(), p.file_size());
+			input.read(buffer, p.file_size());
+			server.write(buffer, p.file_size());
 		}
 	}
 	for (auto& file : dirs)
@@ -335,7 +335,6 @@ int main() {
 				}
 			}
 		}
-
 	}
 	catch (const std::exception& ex) {
 		std::cerr << "client: " << ex.what() << '\n';

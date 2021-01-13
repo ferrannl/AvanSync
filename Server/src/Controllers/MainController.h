@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <iostream>
 #include <filesystem>
 #include <asio.hpp>
+
 namespace fs = std::filesystem;
 
 
@@ -13,7 +13,6 @@ namespace Controllers {
 		std::vector<std::string> _responses;
 		const std::string& _path = "C:\\temp\\server\\result\\";
 	public:
-		//void sync(asio::ip::tcp::iostream& server);
 		void get_right_command(const std::string& command, asio::ip::tcp::iostream& client) const;
 		static std::string info();
 		std::string dir(const std::string& path) const;

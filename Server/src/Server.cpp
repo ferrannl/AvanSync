@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include <stdexcept>
 #include <asio.hpp>
 #include "Controllers/MainController.h"
 
@@ -10,7 +9,7 @@ int main() {
 		const int server_port{ 12345 };
 		const char* lf{ "\n" };
 		const char* crlf{ "\r\n" };
-		std::unique_ptr<Controllers::MainController> main_controller = std::make_unique<Controllers::MainController>();
+		const std::unique_ptr<Controllers::MainController> main_controller = std::make_unique<Controllers::MainController>();
 
 		asio::io_context io_context;
 		asio::ip::tcp::acceptor server{ io_context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), server_port) };
@@ -37,7 +36,6 @@ int main() {
 				}
 			}
 		}
-
 	}
 	catch (const std::exception& ex) {
 		std::cerr << "server: " << ex.what() << '\n';

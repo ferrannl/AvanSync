@@ -2,6 +2,8 @@
 #include "MainController.h"
 #include <sstream>
 #include <fstream>
+#include <iostream>
+
 #include "../Helpers/PathHelper.h"
 
 using namespace Controllers;
@@ -43,11 +45,9 @@ void MainController::get_right_command(const std::string& command, asio::ip::tcp
 	else if (command.find("mkdir") == 0) {
 		std::string result;
 		std::string result2;
-		//Ask for parent dir
 		if (getline(client, result)) {
 			result.erase(result.end() - 1);
 		}
-		//Ask for name for new dir
 		if (getline(client, result2)) {
 			result2.erase(result2.end() - 1);
 		}
@@ -159,15 +159,13 @@ std::string MainController::get(const std::string& path, asio::ip::tcp::iostream
 		std::string result;
 		client << std::to_string(fs::file_size(path)) + "\r\n";
 		std::ifstream streamresult(path, std::ios::binary);
-		//get length of file
 		streamresult.seekg(0, std::ios::end);
 		const size_t length = streamresult.tellg();
 		streamresult.seekg(0, std::ios::beg);
 
-		char buffer[100000];
 		// don't overflow the buffer!
+		char buffer[100000];
 
-		//read file
 		streamresult.read(buffer, length);
 		for (int i = 0; i < length; ++i)
 		{
