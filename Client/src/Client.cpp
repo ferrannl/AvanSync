@@ -21,10 +21,6 @@ std::time_t to_time_t(const TP& tp)
 	return system_clock::to_time_t(sctp);
 }
 
-void info(const std::string& request, asio::ip::tcp::iostream& server) {
-	server << request << "\r\n";
-}
-
 void dir(asio::ip::tcp::iostream& server)
 {
 	std::string request;
@@ -337,9 +333,6 @@ int main() {
 					}
 					else if (req.find("del") == 0) {
 						del(server);
-					}
-					else if (req.find("info") == 0) {
-						info(req, server);
 					}
 					else if (req.find("mkdir") == 0) {
 						mkdir(server);

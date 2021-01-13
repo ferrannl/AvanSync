@@ -22,11 +22,7 @@ class WordDelimitedBy : public std::string
 void MainController::get_commando(const std::string& commando, asio::ip::tcp::iostream& client) const
 {
 	if (commando == "info") {
-		std::string result;
-		if (getline(client, result)) {
-			result.erase(result.end() - 1);
-			client << info() << "\r\n";
-		}
+		client << info() << "\r\n";
 	}
 	else if (commando == "dir") {
 		std::string result;
@@ -102,7 +98,7 @@ void MainController::get_commando(const std::string& commando, asio::ip::tcp::io
 
 std::string MainController::info()
 {
-	return "AvanSync Server 1.0";
+	return "AvanSync Server 1.0 Ferran Hendriks";
 }
 
 std::string MainController::dir(const std::string& path) const
