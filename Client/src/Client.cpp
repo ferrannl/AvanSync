@@ -287,7 +287,7 @@ void sync(asio::ip::tcp::iostream& server) {
 				{
 					exists_in_server = true;
 					file["exists"] = "true";
-					if (buffer.str() > file["writetime"])
+					if (buffer.str() > file["last_modified"])
 					{
 						newer_version = true;
 					}
@@ -296,6 +296,11 @@ void sync(asio::ip::tcp::iostream& server) {
 			}
 			if (!exists_in_server || newer_version)
 			{
+				if (entry.is_directory)
+				{
+					server << "mkdir" << "\r\n";
+					server << entry.path() << "\r\n";
+				}
 				std::string path = _path_server + p.path().string().substr(_path_client.length(), p.path().string().length());
 				server << "put" << "\r\n";
 				server << path << "\r\n";
@@ -318,8 +323,7 @@ void sync(asio::ip::tcp::iostream& server) {
 	}
 }
 
-
-void sync_to_server(std::string req, int bytes, asio::ip::tcp::iostream& server)
+void write_to_server(std::string req, int bytes, asio::ip::tcp::iostream& server)
 {
 	std::ifstream stream(req, std::ios::binary);
 	char* buffer = new char[bytes];
@@ -335,6 +339,19 @@ void sync_to_server(std::string req, int bytes, asio::ip::tcp::iostream& server)
 
 	//server << fs::file_size(fs::path(_path_client + entry.path().filename().string())) << "\r\n";
 	//stream.read(buffer, file_size);
+}
+
+void sync_to_server(asio::ip::tcp::iostream& server, const std::filesystem::directory_entry& entry)
+{
+	std::string _path_server = "C:\\temp\\server\\";
+	std::string _path_client = "C:\\temp\\client\\";
+
+	server << "put" << "\r\n";
+	server << entry.path().filename().string() << "\r\n";
+	int bytes = fs::file_size(fs::path(_path_client + entry.path().filename().string()));
+	server << fs::file_size(fs::path(_path_client + entry.path().filename().string())) << "\r\n";
+
+	write_to_server(_path_client + entry.path().filename().string(), bytes, server);
 }
 
 void quit(const std::string& req, asio::ip::tcp::iostream& server) {
