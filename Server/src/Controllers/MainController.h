@@ -15,8 +15,8 @@ namespace Controllers {
 		static std::string info();
 		std::string dir(const std::string& dirpath) const;
 		std::string del(const std::string& dirpath) const;
-		std::string ren(const std::string& dirpath, const std::string& name) const;
-		std::string mkdir(const std::string& dirpath, const std::string& name) const;
+		std::string ren(const std::string& dirpath, const std::string& dirname) const;
+		std::string mkdir(const std::string& dirpath, const std::string& dirname) const;
 		std::string get(const std::string& dirpath, asio::ip::tcp::iostream& stream) const;
 		std::string put(const std::string& dirpath, int size, asio::ip::tcp::iostream& stream) const;
 	};

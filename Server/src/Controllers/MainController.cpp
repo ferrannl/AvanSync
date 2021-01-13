@@ -91,6 +91,10 @@ void MainController::get_commando(const std::string& commando, asio::ip::tcp::io
 	{
 		std::cerr << "will disconnect from client" << client.socket().local_endpoint() << "\r\n";
 	}
+	else if (commando == "sync")
+	{
+		return;
+	}
 	else {
 		client << "Invalid Command." << "\r\n";
 	}
@@ -188,7 +192,7 @@ std::string MainController::del(const std::string& path) const
 	if (per != std::filesystem::perms::all) {
 		return "Error: no permission \r\n";
 	}
-	std::filesystem::remove(path);
+	std::filesystem::remove_all(path);
 	return "OK \r\n";
 }
 
@@ -223,7 +227,7 @@ std::string MainController::put(const std::string& path, int file_size, asio::ip
 	}
 }
 
-std::string MainController::ren(const std::string& path, const std::string& new_name) const
+std::string MainController::ren(const std::string& path, const std::string& dirname) const
 {
 	if (!std::filesystem::exists(path)) {
 		return "Error: no such file or directory \r\n";
@@ -242,7 +246,7 @@ std::string MainController::ren(const std::string& path, const std::string& new_
 		const std::string end = path2.substr(0, path2.find("/"));
 		path2.erase(0, end.length());
 		std::reverse(path2.begin(), path2.end());
-		path2 += new_name;
+		path2 += dirname;
 		std::filesystem::rename(old_path, path2);
 		return "OK \r\n";
 	}
@@ -251,10 +255,10 @@ std::string MainController::ren(const std::string& path, const std::string& new_
 	}
 }
 
-std::string MainController::mkdir(const std::string& parent, const std::string& name) const
+std::string MainController::mkdir(const std::string& parent, const std::string& dirname) const
 {
 	if (fs::exists(parent)) {
-		std::string path = parent + name;
+		std::string path = parent + dirname;
 		path.erase(remove_if(path.begin(), path.end(), isspace), path.end());
 		std::filesystem::create_directory(path);
 		return "OK \r\n";

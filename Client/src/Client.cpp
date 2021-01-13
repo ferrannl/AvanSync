@@ -170,16 +170,16 @@ void put_server(const std::string& request, const int bytes, asio::ip::tcp::iost
 	server.write(buffer.get(), bytes);
 }
 
-void sync_server(asio::ip::tcp::iostream& server, const std::filesystem::directory_entry& entry)
+void sync_server(asio::ip::tcp::iostream& server, const std::filesystem::directory_entry& dir_entry)
 {
 	const std::string _path_client = "C:\\temp\\client\\";
 
 	server << "put" << "\r\n";
-	server << entry.path().filename().string() << "\r\n";
-	const int bytes = fs::file_size(fs::path(_path_client + entry.path().filename().string()));
-	server << fs::file_size(fs::path(_path_client + entry.path().filename().string())) << "\r\n";
+	server << dir_entry.path().filename().string() << "\r\n";
+	const int bytes = fs::file_size(fs::path(_path_client + dir_entry.path().filename().string()));
+	server << fs::file_size(fs::path(_path_client + dir_entry.path().filename().string())) << "\r\n";
 
-	put_server(_path_client + entry.path().filename().string(), bytes, server);
+	put_server(_path_client + dir_entry.path().filename().string(), bytes, server);
 }
 
 void sync(asio::ip::tcp::iostream& server) {
@@ -226,6 +226,7 @@ void sync(asio::ip::tcp::iostream& server) {
 				dirs.push_back(total);
 			}
 		}
+		return;
 	}
 
 	std::vector<std::string> _files;
