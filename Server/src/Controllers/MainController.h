@@ -16,7 +16,7 @@ namespace Controllers {
 		void get_right_command(const std::string& command, asio::ip::tcp::iostream& client);
 		std::string info();
 		std::string dir(const std::string& path);
-		std::string put(const std::string& path, const std::string& file_size, asio::ip::tcp::iostream& client);
+		std::string put(const std::string& path, int file_size, asio::ip::tcp::iostream& client);
 		std::string ren(const std::string& path, const std::string& new_name);
 		std::string del(const std::string& path);
 		std::string mkdir(const std::string& parent, const std::string& name);

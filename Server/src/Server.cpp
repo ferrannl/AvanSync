@@ -24,7 +24,9 @@ int main() {
 			for (;;) {
 				std::string request;
 				getline(client, request);
-				request.erase(request.end() - 1); // remove '\r'
+				if (!request.empty()) {
+					request.erase(request.end() - 1); // remove '\r'
+				}
 				std::cerr << "client says: " << request << lf;
 				main_controller->get_right_command(request, client);
 

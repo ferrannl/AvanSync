@@ -171,31 +171,49 @@ void get(asio::ip::tcp::iostream& server) {
 //	}
 //}
 
-void put(std::string req, asio::ip::tcp::iostream& server) {
-	if (getline(std::cin, req)) {
-		server << req << "\r\n";
-		server << fs::file_size(req) << "\r\n";
-		std::string result;
-		std::ifstream streamresult(req);
-		//get length of file
-		streamresult.seekg(0, std::ios::end);
-		size_t length = streamresult.tellg();
-		streamresult.seekg(0, std::ios::beg);
-
-		char buffer[1000];
-		// don't overflow the buffer!
-
-		//read file
-		streamresult.read(buffer, length);
-		for (int i = 0; i < length; ++i)
-		{
-			server << buffer[i] << "\r\n";
-		}
+void put(asio::ip::tcp::iostream& server) {
+	std::string path;
+	if (getline(std::cin, path)) {
+		server << path << "\r\n";
+	}
+	std::string result;
+	if (getline(std::cin, result))
+	{
+		server << result << "\r\n";
+		int file_size = std::stoi(result);
+		char* buffer = new char[file_size];
+		std::ifstream input(path, std::ios::binary);
+		input.read(buffer, file_size);
+		server.write(buffer, file_size);
 	}
 	std::string end;
 	if (getline(server, end)) {
 		std::cout << end << "\n";
 	}
+	//if (getline(std::cin, req)) {
+	//	server << req << "\r\n";
+	//	server << fs::file_size(req) << "\r\n";
+	//	std::string result;
+	//	std::ifstream streamresult(req);
+	//	//get length of file
+	//	streamresult.seekg(0, std::ios::end);
+	//	size_t length = streamresult.tellg();
+	//	streamresult.seekg(0, std::ios::beg);
+
+	//	char buffer[100000];
+	//	// don't overflow the buffer!
+
+	//	//read file
+	//	streamresult.read(buffer, length);
+	//	for (int i = 0; i < length; ++i)
+	//	{
+	//		server << buffer[i] << "\r\n";
+	//	}
+	//}
+	//std::string end;
+	//if (getline(server, end)) {
+	//	std::cout << end << "\n";
+	//}
 }
 
 //void put(asio::ip::tcp::iostream& server) {
@@ -400,7 +418,7 @@ int main() {
 						quit(req, server);
 					}
 					else if (req.find("put") == 0) {
-						put(req, server);
+						put(server);
 					}
 					else if (req.find("get") == 0) {
 						get(server);

@@ -72,7 +72,7 @@ void MainController::get_right_command(const std::string& command, asio::ip::tcp
 		}
 		if (getline(client, result2)) {
 		}
-		client << put(result, result2, client) << "\r\n";
+		client << put(result, std::stoi(result2), client) << "\r\n";
 	}
 	else if (command.find("quit") == 0)
 	{
@@ -191,7 +191,7 @@ std::string MainController::del(const std::string& path)
 	return "OK \r\n";
 }
 
-std::string MainController::put(const std::string& path, const std::string& file_size, asio::ip::tcp::iostream& client)
+std::string MainController::put(const std::string& path, int file_size, asio::ip::tcp::iostream& client)
 {
 	if (!std::filesystem::exists(path)) {
 		return "Error: no such file \r\n";
@@ -202,19 +202,37 @@ std::string MainController::put(const std::string& path, const std::string& file
 	if (per != std::filesystem::perms::all) {
 		return "Error: no permission \r\n";
 	}
+	if (fs::is_directory(path))
+	{
+		return "Error: That is a directory! \r\n";
+	}
 	std::string result = path;
-	std::reverse(result.begin(), result.end());
-	std::string old_name = result.substr(0, result.find("/"));
-	std::reverse(old_name.begin(), old_name.end());
-	std::string result_string;
-	int file_size_int = std::stoi(file_size);
-	char* bytes = new char[file_size_int];
-	client.read(bytes, file_size_int);
-	std::string server_path = _path + old_name;
-	std::ofstream streamresult(server_path, std::ios::binary);
-	streamresult.write(bytes, file_size_int);
-	streamresult.close();
+	std::string file_name = fs::path(path).filename().string();
+	if (fs::space(result.substr(0, result.length() - file_name.length())).available < file_size)
+	{
+		return "Error: Not enough disk space \r\n";
+	}
+	result = result.substr(0, result.length() - file_name.length());
+	char* byte = new char[file_size];
+	client.read(byte, file_size);
+	std::ofstream out(_path + file_name, std::ios::binary);
+	out.write(byte, file_size);
+	out.close();
+
 	return "OK! \r\n";
+	//std::string result = path;
+	//std::reverse(result.begin(), result.end());
+	//std::string old_name = result.substr(0, result.find("/"));
+	//std::reverse(old_name.begin(), old_name.end());
+	//std::string result_string;
+	//int file_size_int = std::stoi(file_size);
+	//char* bytes = new char[file_size_int];
+	//client.read(bytes, file_size_int);
+	//std::string server_path = _path + old_name;
+	//std::ofstream streamresult(server_path, std::ios::binary);
+	//streamresult.write(bytes, file_size_int);
+	//streamresult.close();
+	//return "OK! \r\n";
 }
 
 
