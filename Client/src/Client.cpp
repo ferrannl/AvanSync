@@ -140,10 +140,10 @@ void put(asio::ip::tcp::iostream& server) {
 			server << result << "\r\n";
 			try {
 				const int file_size = std::stoi(result);
-				char* buffer = new char[file_size];
+				const std::shared_ptr<char> buffer(new char[file_size], std::default_delete<char[]>());
 				std::ifstream input(path, std::ios::binary);
-				input.read(buffer, file_size);
-				server.write(buffer, file_size);
+				input.read(buffer.get(), file_size);
+				server.write(buffer.get(), file_size);
 				std::string end;
 				if (getline(server, end)) {
 					std::cout << end << "\n";
@@ -162,9 +162,9 @@ void put(asio::ip::tcp::iostream& server) {
 void put_server(const std::string& req, const int bytes, asio::ip::tcp::iostream& server)
 {
 	std::ifstream stream(req, std::ios::binary);
-	char* buffer = new char[bytes];
-	stream.read(buffer, bytes);
-	server.write(buffer, bytes);
+	const std::shared_ptr<char> buffer(new char[bytes], std::default_delete<char[]>());
+	stream.read(buffer.get(), bytes);
+	server.write(buffer.get(), bytes);
 }
 
 void sync_server(asio::ip::tcp::iostream& server, const std::filesystem::directory_entry& entry)
@@ -255,10 +255,10 @@ void sync(asio::ip::tcp::iostream& server) {
 			server << "put" << "\r\n";
 			server << path << "\r\n";
 			server << p.file_size() << "\r\n";
-			char* buffer = new char[p.file_size()];
+			const std::shared_ptr<char> buffer(new char[p.file_size()], std::default_delete<char[]>());
 			std::ifstream input(p.path(), std::ios::binary);
-			input.read(buffer, p.file_size());
-			server.write(buffer, p.file_size());
+			input.read(buffer.get(), p.file_size());
+			server.write(buffer.get(), p.file_size());
 		}
 	}
 	for (auto& file : dirs)
