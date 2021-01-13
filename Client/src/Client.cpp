@@ -112,13 +112,14 @@ void get(asio::ip::tcp::iostream& server) {
 			int iterations = std::stoi(result);
 			std::cout << iterations << "\n";
 			std::string byte;
-			char* bytes = new char[iterations];
-			server.read(bytes, iterations);
+			const std::shared_ptr<char> bytes(new char[iterations], std::default_delete<char[]>());
+
+			server.read(bytes.get(), iterations);
 			for (int i = 0; i < iterations; i++) {
-				std::cout << bytes[i] << "\n";
+				std::cout << bytes.get()[i] << "\n";
 			}
 			std::ofstream streamresult(client_path + fs::path(req).filename().string(), std::ofstream::binary);
-			streamresult.write(bytes, iterations);
+			streamresult.write(bytes.get(), iterations);
 			streamresult.close();
 		}
 	}
@@ -271,92 +272,6 @@ void sync(asio::ip::tcp::iostream& server) {
 		}
 	}
 }
-/*server << "dir" << "\r\n";
-server << _path_server << "\r\n";
-std::string result;
-std::vector<std::map<std::string, std::string>> paths = {};
-if (getline(server, result))
-{
-	const int iterations = std::stoi(result);
-	for (int i = 0; i < iterations; ++i)
-	{
-		if (getline(server, result))
-		{
-			std::string seg;
-			result.erase(result.end() - 1);
-			std::stringstream str(result);
-			std::map<std::string, std::string> map;
-			int counter = 0;
-			while (std::getline(str, seg, '|'))
-			{
-				switch (counter)
-				{
-				case 0:
-					map["isdir"] = seg;
-					++counter;
-					break;
-				case 1:
-					map["filename"] = seg;
-					++counter;
-					break;
-				case 2:
-					map["last_modified"] = seg;
-					++counter;
-					break;
-				case 3:
-					map["filesize"] = seg;
-					++counter;
-					break;
-				}
-			}
-			paths.push_back(map);
-		}
-	}
-	std::vector<std::string> _files;
-	for (const auto& p : fs::recursive_directory_iterator(_path_client))
-	{
-		auto test = fs::last_write_time(p.path());
-		std::time_t tt = to_time_t(test);
-		std::tm* gmt = std::localtime(&tt);
-		std::stringstream buffer;
-		buffer << std::put_time(gmt, "%F %T");
-		bool exists_in_server = false;
-		bool newer_version = false;
-		for (auto& file : paths)
-		{
-			if (fs::path(p).filename() == file["filename"])
-			{
-				exists_in_server = true;
-				file["exists"] = "true";
-				if (buffer.str() > file["last_modified"])
-				{
-					newer_version = true;
-				}
-			}
-		}
-		if (!exists_in_server || newer_version)
-		{
-			if (p.is_directory())
-			{
-				server << "mkdir" << "\r\n";
-				server << p.path() << "\r\n";
-				server << p.path().filename().string() << "\r\n";
-			}
-			else
-			{
-				sync_server(server, p);
-			}
-		}
-	}
-	for (auto& file : paths)
-	{
-		if (file["exists"] != "true")
-		{
-			std::string path = _path_server + file["filename"];
-			server << "del" << "\r\n";
-			server << path << "\r\n";
-		}
-	}*/
 
 void quit(const std::string& req, asio::ip::tcp::iostream& server) {
 	server << req << "\r\n";
