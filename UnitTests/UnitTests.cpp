@@ -1,18 +1,15 @@
 #include "pch.h"
-
 #include <asio.hpp>
-
 #include "CppUnitTest.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace UnitTests
 {
-	TEST_CLASS(ServerTest)
+	TEST_CLASS(UnitTests)
 	{
 	public:
-
-		TEST_METHOD(Info)
+		TEST_METHOD(Info_Succesfully_Returned_General_Info)
 		{
 			const std::string server_address{ "localhost" };
 			const std::string server_port{ "12345" };
@@ -36,30 +33,7 @@ namespace UnitTests
 			server << "quit" << crlf;
 		}
 
-		TEST_METHOD(Quit)
-		{
-			const std::string server_address{ "localhost" };
-			const std::string server_port{ "12345" };
-			const std::string lf{ "\n" };
-			const std::string crlf{ "\r\n" };
-
-			asio::ip::tcp::iostream server = asio::ip::tcp::iostream{ server_address, server_port };
-			if (!server) throw std::runtime_error("could not connect to server");
-
-			std::string resp;
-			if (getline(server, resp)) {
-				resp.erase(resp.end() - 1); // remove '\r'
-			}
-
-			server << "quit" << crlf;
-			if (getline(server, resp)) {
-				resp.erase(resp.end() - 1); // remove '\r'
-			}
-			std::string res = "Bye.";
-			Assert::AreEqual(res, resp);
-		}
-
-		TEST_METHOD(DirSucces)
+		TEST_METHOD(Dir_Succesful_Listing)
 		{
 			const std::string server_address{ "localhost" };
 			const std::string server_port{ "12345" };
@@ -84,7 +58,7 @@ namespace UnitTests
 			server << "quit" << crlf;
 		}
 
-		TEST_METHOD(DirFailed)
+		TEST_METHOD(Dir_Unsuccesful_Listing)
 		{
 			const std::string server_address{ "localhost" };
 			const std::string server_port{ "12345" };
@@ -109,7 +83,7 @@ namespace UnitTests
 			server << "quit" << crlf;
 		}
 
-		TEST_METHOD(GetFailed)
+		TEST_METHOD(Get_Unsuccesful_Download)
 		{
 			const std::string server_address{ "localhost" };
 			const std::string server_port{ "12345" };
@@ -134,7 +108,7 @@ namespace UnitTests
 			server << "quit" << crlf;
 		}
 
-		TEST_METHOD(PutFailed)
+		TEST_METHOD(Put_Unsuccesful_Upload)
 		{
 			const std::string server_address{ "localhost" };
 			const std::string server_port{ "12345" };
@@ -159,7 +133,7 @@ namespace UnitTests
 			server << "quit" << crlf;
 		}
 
-		TEST_METHOD(RenFailed)
+		TEST_METHOD(Ren_Unsuccesful_Rename)
 		{
 			const std::string server_address{ "localhost" };
 			const std::string server_port{ "12345" };
@@ -184,7 +158,7 @@ namespace UnitTests
 			server << "quit" << crlf;
 		}
 
-		TEST_METHOD(DelFailed)
+		TEST_METHOD(Del_Unsuccesful_Delete)
 		{
 			const std::string server_address{ "localhost" };
 			const std::string server_port{ "12345" };
@@ -209,7 +183,7 @@ namespace UnitTests
 			server << "quit" << crlf;
 		}
 
-		TEST_METHOD(MkdirFailed)
+		TEST_METHOD(Mkdir_Unsuccesful_NewDirectory)
 		{
 			const std::string server_address{ "localhost" };
 			const std::string server_port{ "12345" };

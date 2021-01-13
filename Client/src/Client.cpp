@@ -22,7 +22,6 @@ std::time_t to_time_t(const TP& tp)
 }
 
 void info(const std::string& req, asio::ip::tcp::iostream& server) {
-
 	server << req << "\r\n";
 }
 
@@ -173,7 +172,6 @@ void put_server(const std::string& req, const int bytes, asio::ip::tcp::iostream
 
 void sync_server(asio::ip::tcp::iostream& server, const std::filesystem::directory_entry& entry)
 {
-	const std::string _path_server = "C:\\temp\\server\\";
 	const std::string _path_client = "C:\\temp\\client\\";
 
 	server << "put" << "\r\n";
@@ -186,7 +184,6 @@ void sync_server(asio::ip::tcp::iostream& server, const std::filesystem::directo
 
 void sync(asio::ip::tcp::iostream& server) {
 	const std::string _path_server = "C:\\temp\\server\\";
-	const std::string _path_client = "C:\\temp\\client\\";
 	int response_counter = 0;
 	server << "dir" << "\r\n";
 	server << _path_server << "\r\n";
@@ -232,6 +229,7 @@ void sync(asio::ip::tcp::iostream& server) {
 	}
 
 	std::vector<std::string> _files;
+	const std::string _path_client = "C:\\temp\\client\\";
 	for (auto& p : fs::recursive_directory_iterator(_path_client))
 	{
 		auto test = fs::last_write_time(p.path());
@@ -250,7 +248,6 @@ void sync(asio::ip::tcp::iostream& server) {
 					newer_version = true;
 				}
 			}
-
 		}
 		if (!exists_in_server || newer_version)
 		{
@@ -275,7 +272,6 @@ void sync(asio::ip::tcp::iostream& server) {
 					}
 					++response_counter;
 				}
-
 			}
 			else {
 				std::string path = _path_client + p.path().string().substr(_path_client.length(), p.path().string().length());
@@ -329,6 +325,7 @@ int main() {
 				std::cout << prompt;
 				std::string req;
 				if (getline(std::cin, req)) {
+
 					if (req.find("sync") == 0)
 					{
 						sync(server);
@@ -358,10 +355,6 @@ int main() {
 					}
 					else if (req.find("get") == 0) {
 						get(server);
-					}
-					else
-					{
-
 					}
 				}
 			}

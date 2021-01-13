@@ -32,7 +32,7 @@ int main() {
 					request.erase(request.end() - 1); // remove '\r'
 				}
 				std::cerr << "client says: " << request << lf;
-				main_controller->get_right_command(request, client);
+				main_controller->get_command(request, client);
 
 				if (request == "quit") {
 					client << "Bye." << crlf;

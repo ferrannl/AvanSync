@@ -4,15 +4,22 @@
 #include <fstream>
 #include <iostream>
 
-#include "../Helpers/PathHelper.h"
-
 using namespace Controllers;
+
+template <typename TP>
+std::time_t to_time_t(const TP& tp)
+{
+	using namespace std::chrono;
+	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now()
+		+ system_clock::now());
+	return system_clock::to_time_t(sctp);
+}
 
 template<char delimiter>
 class WordDelimitedBy : public std::string
 {};
 
-void MainController::get_right_command(const std::string& command, asio::ip::tcp::iostream& client) const
+void MainController::get_command(const std::string& command, asio::ip::tcp::iostream& client) const
 {
 	if (command.find("info") == 0) {
 		std::string result;
@@ -94,15 +101,6 @@ std::string MainController::info()
 	return "AvanSync Server 1.0";
 }
 
-template <typename TP>
-std::time_t to_time_t(const TP& tp)
-{
-	using namespace std::chrono;
-	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now()
-		+ system_clock::now());
-	return system_clock::to_time_t(sctp);
-}
-
 std::string MainController::dir(const std::string& path) const
 {
 	std::string dir_list;
@@ -120,7 +118,6 @@ std::string MainController::dir(const std::string& path) const
 		}
 		dir_list += std::to_string(counter) + "\r\n";
 		for (const auto& entry : fs::recursive_directory_iterator(path)) {
-
 			if (entry.is_directory())
 			{
 				dir_list += "D|";
@@ -226,7 +223,6 @@ std::string MainController::put(const std::string& path, int file_size, asio::ip
 	}
 }
 
-
 std::string MainController::ren(const std::string& path, const std::string& new_name) const
 {
 	if (!std::filesystem::exists(path)) {
@@ -253,7 +249,6 @@ std::string MainController::ren(const std::string& path, const std::string& new_
 	else {
 		return "Error: no such file or directory \r\n";
 	}
-
 }
 
 std::string MainController::mkdir(const std::string& parent, const std::string& name) const
