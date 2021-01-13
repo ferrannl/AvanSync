@@ -1,4 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -97,7 +100,7 @@ void del(asio::ip::tcp::iostream& server) {
 }
 
 void get(asio::ip::tcp::iostream& server) {
-	const std::string client_path = "C:\\temp\\client\\result\\";
+	const std::string _path_client = "C:\\temp\\client\\result\\";
 	std::string req;
 	if (getline(std::cin, req)) {
 		server << req << "\r\n";
@@ -118,7 +121,7 @@ void get(asio::ip::tcp::iostream& server) {
 			for (int i = 0; i < iterations; i++) {
 				std::cout << bytes.get()[i] << "\n";
 			}
-			std::ofstream streamresult(client_path + fs::path(req).filename().string(), std::ofstream::binary);
+			std::ofstream streamresult(_path_client + fs::path(req).filename().string(), std::ofstream::binary);
 			streamresult.write(bytes.get(), iterations);
 			streamresult.close();
 		}
@@ -151,7 +154,7 @@ void put(asio::ip::tcp::iostream& server) {
 					std::cout << end << "\n";
 				}
 			}
-			catch (std::exception e)
+			catch (const std::exception& e)
 			{
 				std::cout << "Error: " << e.what() << "\r\n";
 				return;
@@ -184,6 +187,7 @@ void sync_server(asio::ip::tcp::iostream& server, const std::filesystem::directo
 void sync(asio::ip::tcp::iostream& server) {
 	const std::string _path_server = "C:\\temp\\server\\";
 	const std::string _path_client = "C:\\temp\\client\\";
+	int response_counter = 0;
 	server << "dir" << "\r\n";
 	server << _path_server << "\r\n";
 	std::string result;
@@ -228,11 +232,10 @@ void sync(asio::ip::tcp::iostream& server) {
 	}
 
 	std::vector<std::string> _files;
-	for (auto& p : fs::directory_iterator(_path_client))
+	for (auto& p : fs::recursive_directory_iterator(_path_client))
 	{
 		auto test = fs::last_write_time(p.path());
 		std::time_t tt = to_time_t(test);
-		std::tm* gmt = std::localtime(&tt);
 		std::stringstream buffer;
 		buffer << std::put_time(std::localtime(&tt), "%Y-%m-%d %H:%M:%S");
 		bool exists_in_server = false;
@@ -242,7 +245,6 @@ void sync(asio::ip::tcp::iostream& server) {
 			if (p.path().filename() == file["filename"])
 			{
 				exists_in_server = true;
-				file["exists"] = "true";
 				if (buffer.str() > file["writetime"])
 				{
 					newer_version = true;
@@ -252,23 +254,50 @@ void sync(asio::ip::tcp::iostream& server) {
 		}
 		if (!exists_in_server || newer_version)
 		{
-			std::string path = _path_server + p.path().string().substr(_path_client.length(), p.path().string().length());
-			server << "put" << "\r\n";
-			server << path << "\r\n";
-			server << p.file_size() << "\r\n";
-			char* buffer = new char[p.file_size()];
-			std::ifstream input(p.path(), std::ios::binary);
-			input.read(buffer, p.file_size());
-			server.write(buffer, p.file_size());
-		}
-	}
-	for (auto& file : dirs)
-	{
-		if (file["exists"] != "true")
-		{
-			std::string path = _path_server + file["filename"];
-			server << "del" << "\r\n";
-			server << path << "\r\n";
+			if (p.is_directory())
+			{
+				server << "mkdir" << "\r\n";
+				int name = p.path().filename().string().length();
+				int text = _path_client.length();
+				std::string dir_path = p.path().string().substr(0, p.path().string().length() - name);
+				std::string str_without_dir_path = dir_path.substr(text, dir_path.length());
+				std::string parent_dir = _path_server + str_without_dir_path;
+				server << parent_dir << "\r\n";
+				server << p.path().filename().string() << "\r\n";
+				std::string response;
+				if (getline(server, response))
+				{
+				}
+				if (response_counter <= 12)
+				{
+					if (getline(server, response))
+					{
+					}
+					++response_counter;
+				}
+
+			}
+			else {
+				std::string path = _path_client + p.path().string().substr(_path_client.length(), p.path().string().length());
+				server << "put" << "\r\n";
+				server << path << "\r\n";
+				server << p.file_size() << "\r\n";
+				std::shared_ptr<char> buffer(new char[p.file_size()], std::default_delete<char[]>());
+				std::ifstream input(p.path(), std::ios::binary);
+				input.read(buffer.get(), p.file_size());
+				server.write(buffer.get(), p.file_size());
+				std::string response;
+				if (getline(server, response))
+				{
+				}
+				if (response_counter <= 12)
+				{
+					if (getline(server, response))
+					{
+					}
+					++response_counter;
+				}
+			}
 		}
 	}
 }
@@ -279,6 +308,8 @@ void quit(const std::string& req, asio::ip::tcp::iostream& server) {
 
 int main() {
 	try {
+		_CrtDumpMemoryLeaks();
+
 		const char* server_address{ "localhost" };
 		const char* server_port{ "12345" };
 		const char* prompt{ "avansync> " };

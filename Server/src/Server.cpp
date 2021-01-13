@@ -1,3 +1,6 @@
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -6,6 +9,8 @@
 
 int main() {
 	try {
+		_CrtDumpMemoryLeaks();
+
 		const int server_port{ 12345 };
 		const char* lf{ "\n" };
 		const char* crlf{ "\r\n" };

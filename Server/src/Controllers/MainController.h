@@ -11,7 +11,7 @@ namespace Controllers {
 	class MainController {
 	private:
 		std::vector<std::string> _responses;
-		const std::string& _path = "C:\\temp\\server\\result\\";
+		const std::string& _path = "C:\\temp\\server\\";
 	public:
 		void get_right_command(const std::string& command, asio::ip::tcp::iostream& client) const;
 		static std::string info();
