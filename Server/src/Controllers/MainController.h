@@ -13,14 +13,14 @@ namespace Controllers {
 		std::vector<std::string> _responses;
 		const std::string& _path = "C:\\temp\\server\\result\\";
 	public:
-		void get_right_command(const std::string& command, asio::ip::tcp::iostream& client);
-		std::string info();
-		std::string dir(const std::string& path);
-		std::string put(const std::string& path, int file_size, asio::ip::tcp::iostream& client);
-		std::string ren(const std::string& path, const std::string& new_name);
-		std::string del(const std::string& path);
-		std::string mkdir(const std::string& parent, const std::string& name);
-		std::string get(const std::string& path, asio::ip::tcp::iostream& client);
-		void sync(asio::ip::tcp::iostream& server);
+		//void sync(asio::ip::tcp::iostream& server);
+		void get_right_command(const std::string& command, asio::ip::tcp::iostream& client) const;
+		static std::string info();
+		std::string dir(const std::string& path) const;
+		std::string del(const std::string& path) const;
+		std::string ren(const std::string& path, const std::string& new_name) const;
+		std::string mkdir(const std::string& parent, const std::string& name) const;
+		std::string get(const std::string& path, asio::ip::tcp::iostream& client) const;
+		std::string put(const std::string& path, int file_size, asio::ip::tcp::iostream& client) const;
 	};
 }

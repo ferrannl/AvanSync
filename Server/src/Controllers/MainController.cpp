@@ -10,7 +10,7 @@ template<char delimiter>
 class WordDelimitedBy : public std::string
 {};
 
-void MainController::get_right_command(const std::string& command, asio::ip::tcp::iostream& client)
+void MainController::get_right_command(const std::string& command, asio::ip::tcp::iostream& client) const
 {
 	if (command.find("info") == 0) {
 		std::string result;
@@ -103,7 +103,7 @@ std::time_t to_time_t(const TP& tp)
 	return system_clock::to_time_t(sctp);
 }
 
-std::string MainController::dir(const std::string& path)
+std::string MainController::dir(const std::string& path) const
 {
 	std::string dir_list;
 	if (!fs::exists(path)) {
@@ -149,7 +149,7 @@ std::string MainController::dir(const std::string& path)
 	return dir_list;
 }
 
-std::string MainController::get(const std::string& path, asio::ip::tcp::iostream& client)
+std::string MainController::get(const std::string& path, asio::ip::tcp::iostream& client) const
 {
 	std::string return_list;
 	if (fs::exists(path)) {
@@ -161,7 +161,7 @@ std::string MainController::get(const std::string& path, asio::ip::tcp::iostream
 		std::ifstream streamresult(path, std::ios::binary);
 		//get length of file
 		streamresult.seekg(0, std::ios::end);
-		size_t length = streamresult.tellg();
+		const size_t length = streamresult.tellg();
 		streamresult.seekg(0, std::ios::beg);
 
 		char buffer[100000];
@@ -181,14 +181,14 @@ std::string MainController::get(const std::string& path, asio::ip::tcp::iostream
 	return return_list;
 }
 
-std::string MainController::del(const std::string& path)
+std::string MainController::del(const std::string& path) const
 {
 	if (!std::filesystem::exists(path)) {
 		return "Error: no such file or directory \r\n";
 	}
 
-	auto dir = std::filesystem::directory_entry(path);
-	auto per = dir.status().permissions();
+	const auto dir = std::filesystem::directory_entry(path);
+	const auto per = dir.status().permissions();
 
 	if (per != std::filesystem::perms::all) {
 		return "Error: no permission \r\n";
@@ -197,7 +197,7 @@ std::string MainController::del(const std::string& path)
 	return "OK \r\n";
 }
 
-std::string MainController::put(const std::string& path, int file_size, asio::ip::tcp::iostream& client)
+std::string MainController::put(const std::string& path, int file_size, asio::ip::tcp::iostream& client) const
 {
 	if (fs::exists(path)) {
 		if (fs::status(path).permissions() != fs::perms::all) {
@@ -205,13 +205,13 @@ std::string MainController::put(const std::string& path, int file_size, asio::ip
 		}
 		if (fs::is_directory(path))
 		{
-			return "Error: That is a directory! \r\n";
+			return "Error: invalid path \r\n";
 		}
 		std::string result = path;
-		std::string file_name = fs::path(path).filename().string();
+		const std::string file_name = fs::path(path).filename().string();
 		if (fs::space(result.substr(0, result.length() - file_name.length())).available < file_size)
 		{
-			return "Error: Not enough disk space \r\n";
+			return "Error: not enough disk space \r\n";
 		}
 		result = result.substr(0, result.length() - file_name.length());
 		char* byte = new char[file_size];
@@ -224,28 +224,28 @@ std::string MainController::put(const std::string& path, int file_size, asio::ip
 	}
 	else
 	{
-		return "Error: no such file \r\n";
+		return "Error: invalid path \r\n";
 	}
 }
 
 
-std::string MainController::ren(const std::string& path, const std::string& new_name)
+std::string MainController::ren(const std::string& path, const std::string& new_name) const
 {
 	if (!std::filesystem::exists(path)) {
 		return "Error: no such file or directory \r\n";
 	}
 
-	auto dir = std::filesystem::directory_entry(path);
-	auto per = dir.status().permissions();
+	const auto dir = std::filesystem::directory_entry(path);
+	const auto per = dir.status().permissions();
 
 	if (per != std::filesystem::perms::all) {
 		return "Error: no permission \r\n";
 	}
 	std::string path2 = path;
 	if (std::filesystem::exists(path2)) {
-		std::string old_path = path2;
+		const std::string old_path = path2;
 		std::reverse(path2.begin(), path2.end());
-		std::string end = path2.substr(0, path2.find("/"));
+		const std::string end = path2.substr(0, path2.find("/"));
 		path2.erase(0, end.length());
 		std::reverse(path2.begin(), path2.end());
 		path2 += new_name;
@@ -253,12 +253,12 @@ std::string MainController::ren(const std::string& path, const std::string& new_
 		return "OK \r\n";
 	}
 	else {
-		return "Error: invalid path \r\n";
+		return "Error: no such file or directory \r\n";
 	}
 
 }
 
-std::string MainController::mkdir(const std::string& parent, const std::string& name)
+std::string MainController::mkdir(const std::string& parent, const std::string& name) const
 {
 	if (fs::exists(parent)) {
 		std::string path = parent + name;
@@ -269,8 +269,4 @@ std::string MainController::mkdir(const std::string& parent, const std::string& 
 	else {
 		return "Error: no such directory \r\n";
 	}
-}
-void MainController::sync(asio::ip::tcp::iostream& server)
-{
-
 }
