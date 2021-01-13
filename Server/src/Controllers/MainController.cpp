@@ -206,7 +206,6 @@ std::string MainController::put(const std::string& path, int file_size, asio::ip
 			return "Error: invalid path \r\n";
 		}
 		std::string result = path;
-		std::string end_folder = fs::path(result).filename().string();
 		const std::string file_name = fs::path(path).filename().string();
 		if (fs::space(result.substr(0, result.length() - file_name.length())).available < file_size)
 		{
