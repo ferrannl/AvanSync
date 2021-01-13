@@ -71,8 +71,14 @@ void MainController::get_right_command(const std::string& command, asio::ip::tcp
 			result.erase(result.end() - 1);
 		}
 		if (getline(client, result2)) {
+			try {
+				client << put(result, std::stoi(result2), client) << "\r\n";
+			}
+			catch (std::exception e)
+			{
+				client << "Error: " << e.what() << "\r\n";
+			}
 		}
-		client << put(result, std::stoi(result2), client) << "\r\n";
 	}
 	else if (command.find("quit") == 0)
 	{
@@ -193,46 +199,33 @@ std::string MainController::del(const std::string& path)
 
 std::string MainController::put(const std::string& path, int file_size, asio::ip::tcp::iostream& client)
 {
-	if (!std::filesystem::exists(path)) {
+	if (fs::exists(path)) {
+		if (fs::status(path).permissions() != fs::perms::all) {
+			return "Error: no permission \r\n";
+		}
+		if (fs::is_directory(path))
+		{
+			return "Error: That is a directory! \r\n";
+		}
+		std::string result = path;
+		std::string file_name = fs::path(path).filename().string();
+		if (fs::space(result.substr(0, result.length() - file_name.length())).available < file_size)
+		{
+			return "Error: Not enough disk space \r\n";
+		}
+		result = result.substr(0, result.length() - file_name.length());
+		char* byte = new char[file_size];
+		client.read(byte, file_size);
+		std::ofstream out(_path + file_name, std::ios::binary);
+		out.write(byte, file_size);
+		out.close();
+
+		return "OK! \r\n";
+	}
+	else
+	{
 		return "Error: no such file \r\n";
 	}
-	auto dir = std::filesystem::directory_entry(path);
-	auto per = dir.status().permissions();
-
-	if (per != std::filesystem::perms::all) {
-		return "Error: no permission \r\n";
-	}
-	if (fs::is_directory(path))
-	{
-		return "Error: That is a directory! \r\n";
-	}
-	std::string result = path;
-	std::string file_name = fs::path(path).filename().string();
-	if (fs::space(result.substr(0, result.length() - file_name.length())).available < file_size)
-	{
-		return "Error: Not enough disk space \r\n";
-	}
-	result = result.substr(0, result.length() - file_name.length());
-	char* byte = new char[file_size];
-	client.read(byte, file_size);
-	std::ofstream out(_path + file_name, std::ios::binary);
-	out.write(byte, file_size);
-	out.close();
-
-	return "OK! \r\n";
-	//std::string result = path;
-	//std::reverse(result.begin(), result.end());
-	//std::string old_name = result.substr(0, result.find("/"));
-	//std::reverse(old_name.begin(), old_name.end());
-	//std::string result_string;
-	//int file_size_int = std::stoi(file_size);
-	//char* bytes = new char[file_size_int];
-	//client.read(bytes, file_size_int);
-	//std::string server_path = _path + old_name;
-	//std::ofstream streamresult(server_path, std::ios::binary);
-	//streamresult.write(bytes, file_size_int);
-	//streamresult.close();
-	//return "OK! \r\n";
 }
 
 

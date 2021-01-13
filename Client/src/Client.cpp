@@ -32,11 +32,7 @@ void dir(asio::ip::tcp::iostream& server)
 	std::string result;
 	if (getline(server, result))
 	{
-		if (result == "Error: no such file \r")
-		{
-			std::cout << result << "\n";
-		}
-		else if (result == "Error: no permission \r")
+		if (result.rfind("Error:", 0) == 0)
 		{
 			std::cout << result << "\n";
 		}
@@ -90,11 +86,7 @@ void del(asio::ip::tcp::iostream& server) {
 	}
 	std::string result;
 	if (getline(server, result)) {
-		if (result == "Error: no such file or directory \r")
-		{
-			std::cout << result << "\n";
-		}
-		else if (result == "Error: no permission \r")
+		if (result.rfind("Error:", 0) == 0)
 		{
 			std::cout << result << "\n";
 		}
@@ -112,11 +104,7 @@ void get(asio::ip::tcp::iostream& server) {
 	}
 	std::string result;
 	if (getline(server, result)) {
-		if (result == "Error: no such file \r")
-		{
-			std::cout << result << "\n";
-		}
-		else if (result == "Error: no permission \r")
+		if (result.rfind("Error:", 0) == 0)
 		{
 			std::cout << result << "\n";
 		}
@@ -135,41 +123,6 @@ void get(asio::ip::tcp::iostream& server) {
 		}
 	}
 }
-//Ask for path
-//std::string req;
-//if (getline(std::cin, req)) {
-//	server << req << "\r\n";
-//}
-//std::string result;
-//if (getline(server, result)) {
-//	if (result == "Error: no such file \r")
-//	{
-//		std::cout << result << "\n";
-//	}
-//	else if (result == "Error: no permission \r")
-//	{
-//		std::cout << result << "\n";
-//	}
-//	else {
-//		std::uintmax_t size = std::filesystem::file_size(req);
-//		std::cout << "File is " + std::to_string(size) + " bytes \r\n";
-//		const int iterations = std::stoi(result);
-//		std::string byte;
-//		std::string result_string;
-//		for (int i = 0; i < iterations; ++i)
-//		{
-//			if (getline(server, byte))
-//			{
-//				byte = byte.substr(0, 1);
-//				result_string += byte;
-//				std::cout << byte << "\n";
-//			}
-//		}
-
-//		streamresult << result_string;
-//		streamresult.close();
-//	}
-//}
 
 void put(asio::ip::tcp::iostream& server) {
 	std::string path;
@@ -179,87 +132,38 @@ void put(asio::ip::tcp::iostream& server) {
 	std::string result;
 	if (getline(std::cin, result))
 	{
-		server << result << "\r\n";
-		int file_size = std::stoi(result);
-		char* buffer = new char[file_size];
-		std::ifstream input(path, std::ios::binary);
-		input.read(buffer, file_size);
-		server.write(buffer, file_size);
-	}
-	std::string end;
-	if (getline(server, end)) {
-		std::cout << end << "\n";
-	}
-	//if (getline(std::cin, req)) {
-	//	server << req << "\r\n";
-	//	server << fs::file_size(req) << "\r\n";
-	//	std::string result;
-	//	std::ifstream streamresult(req);
-	//	//get length of file
-	//	streamresult.seekg(0, std::ios::end);
-	//	size_t length = streamresult.tellg();
-	//	streamresult.seekg(0, std::ios::beg);
+		if (result.rfind("Error:", 0) == 0)
+		{
+			std::cout << result << "\n";
+		}
+		else {
+			server << result << "\r\n";
+			try {
+				int file_size = std::stoi(result);
+				char* buffer = new char[file_size];
+				std::ifstream input(path, std::ios::binary);
+				input.read(buffer, file_size);
+				server.write(buffer, file_size);
+				std::string end;
+				if (getline(server, end)) {
+					std::cout << end << "\n";
+				}
+			}
+			catch (std::exception e)
+			{
+				std::cout << "Error: " << e.what() << "\r\n";
+				return;
+			}
+		}
 
-	//	char buffer[100000];
-	//	// don't overflow the buffer!
-
-	//	//read file
-	//	streamresult.read(buffer, length);
-	//	for (int i = 0; i < length; ++i)
-	//	{
-	//		server << buffer[i] << "\r\n";
-	//	}
-	//}
-	//std::string end;
-	//if (getline(server, end)) {
-	//	std::cout << end << "\n";
-	//}
+	}
 }
-
-//void put(asio::ip::tcp::iostream& server) {
-//	std::string req;
-//	if (getline(std::cin, req)) {
-//		server << req << "\r\n";
-//		server << fs::file_size(req) << "\r\n";
-//		std::string result;
-//		std::ifstream streamresult(req);
-//		//get length of file
-//		streamresult.seekg(0, std::ios::end);
-//		size_t length = streamresult.tellg();
-//		streamresult.seekg(0, std::ios::beg);
-//
-//		// don't overflow the buffer!
-//		char buffer[100000];
-//
-//		//read file
-//		streamresult.read(buffer, length);
-//		for (int i = 0; i < length; ++i)
-//		{
-//			server << buffer[i] << "\r\n";
-//		}
-//	std::string end;
-//	if (getline(server, end)) {
-//		std::cout << end << "\n";
-//	}
-//	}
-//}
-
 void write_to_server(std::string req, int bytes, asio::ip::tcp::iostream& server)
 {
 	std::ifstream stream(req, std::ios::binary);
 	char* buffer = new char[bytes];
 	stream.read(buffer, bytes);
 	server.write(buffer, bytes);
-
-	//std::string _path_server = "C:\\temp\\server\\";
-	//std::string _path_client = "C:\\temp\\client\\";
-	//server << "put" << "\r\n";
-	//server << _path_server + entry.path().filename().string() << "\r\n";
-	//std::ifstream stream(_path_client + entry.path().filename().string(), std::ios::binary);
-	//int file_size = fs::file_size(fs::path(_path_client + entry.path().filename().string()));
-
-	//server << fs::file_size(fs::path(_path_client + entry.path().filename().string())) << "\r\n";
-	//stream.read(buffer, file_size);
 }
 
 void sync_to_server(asio::ip::tcp::iostream& server, const std::filesystem::directory_entry& entry)
