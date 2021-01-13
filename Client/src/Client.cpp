@@ -21,15 +21,15 @@ std::time_t to_time_t(const TP& tp)
 	return system_clock::to_time_t(sctp);
 }
 
-void info(const std::string& req, asio::ip::tcp::iostream& server) {
-	server << req << "\r\n";
+void info(const std::string& request, asio::ip::tcp::iostream& server) {
+	server << request << "\r\n";
 }
 
 void dir(asio::ip::tcp::iostream& server)
 {
-	std::string req;
-	if (getline(std::cin, req)) {
-		server << req << "\r\n";
+	std::string request;
+	if (getline(std::cin, request)) {
+		server << request << "\r\n";
 	}
 	std::string result;
 	if (getline(server, result))
@@ -39,8 +39,8 @@ void dir(asio::ip::tcp::iostream& server)
 			std::cout << result << "\n";
 		}
 		else {
-			const int iterations = std::stoi(result);
-			for (int i = 0; i < iterations; ++i)
+			const int it = std::stoi(result);
+			for (int i = 0; i < it; ++i)
 			{
 				if (getline(server, result))
 				{
@@ -52,13 +52,13 @@ void dir(asio::ip::tcp::iostream& server)
 }
 
 void mkdir(asio::ip::tcp::iostream& server) {
-	std::string req;
+	std::string request;
 
-	if (getline(std::cin, req)) {
-		server << req << "\r\n";
+	if (getline(std::cin, request)) {
+		server << request << "\r\n";
 	}
-	if (getline(std::cin, req)) {
-		server << req << "\r\n";
+	if (getline(std::cin, request)) {
+		server << request << "\r\n";
 	}
 	std::string result;
 	if (getline(server, result)) {
@@ -67,13 +67,13 @@ void mkdir(asio::ip::tcp::iostream& server) {
 }
 
 void ren(asio::ip::tcp::iostream& server) {
-	std::string req;
+	std::string request;
 
-	if (getline(std::cin, req)) {
-		server << req << "\r\n";
+	if (getline(std::cin, request)) {
+		server << request << "\r\n";
 	}
-	if (getline(std::cin, req)) {
-		server << req << "\r\n";
+	if (getline(std::cin, request)) {
+		server << request << "\r\n";
 	}
 	std::string result;
 	if (getline(server, result)) {
@@ -82,9 +82,9 @@ void ren(asio::ip::tcp::iostream& server) {
 }
 
 void del(asio::ip::tcp::iostream& server) {
-	std::string req;
-	if (getline(std::cin, req)) {
-		server << req << "\r\n";
+	std::string request;
+	if (getline(std::cin, request)) {
+		server << request << "\r\n";
 	}
 	std::string result;
 	if (getline(server, result)) {
@@ -100,9 +100,9 @@ void del(asio::ip::tcp::iostream& server) {
 
 void get(asio::ip::tcp::iostream& server) {
 	const std::string _path_client = "C:\\temp\\client\\result\\";
-	std::string req;
-	if (getline(std::cin, req)) {
-		server << req << "\r\n";
+	std::string request;
+	if (getline(std::cin, request)) {
+		server << request << "\r\n";
 	}
 	std::string result;
 	if (getline(server, result)) {
@@ -120,7 +120,7 @@ void get(asio::ip::tcp::iostream& server) {
 			for (int i = 0; i < iterations; i++) {
 				std::cout << bytes.get()[i] << "\n";
 			}
-			std::ofstream streamresult(_path_client + fs::path(req).filename().string(), std::ofstream::binary);
+			std::ofstream streamresult(_path_client + fs::path(request).filename().string(), std::ofstream::binary);
 			streamresult.write(bytes.get(), iterations);
 			streamresult.close();
 		}
@@ -162,9 +162,9 @@ void put(asio::ip::tcp::iostream& server) {
 	}
 }
 
-void put_server(const std::string& req, const int bytes, asio::ip::tcp::iostream& server)
+void put_server(const std::string& request, const int bytes, asio::ip::tcp::iostream& server)
 {
-	std::ifstream stream(req, std::ios::binary);
+	std::ifstream stream(request, std::ios::binary);
 	const std::shared_ptr<char> buffer(new char[bytes], std::default_delete<char[]>());
 	stream.read(buffer.get(), bytes);
 	server.write(buffer.get(), bytes);
@@ -184,7 +184,7 @@ void sync_server(asio::ip::tcp::iostream& server, const std::filesystem::directo
 
 void sync(asio::ip::tcp::iostream& server) {
 	const std::string _path_server = "C:\\temp\\server\\";
-	int response_counter = 0;
+	int resp_ctr = 0;
 	server << "dir" << "\r\n";
 	server << _path_server << "\r\n";
 	std::string result;
@@ -230,9 +230,9 @@ void sync(asio::ip::tcp::iostream& server) {
 
 	std::vector<std::string> _files;
 	const std::string _path_client = "C:\\temp\\client\\";
-	for (auto& p : fs::recursive_directory_iterator(_path_client))
+	for (auto& directory_entry : fs::recursive_directory_iterator(_path_client))
 	{
-		auto test = fs::last_write_time(p.path());
+		auto test = fs::last_write_time(directory_entry.path());
 		std::time_t tt = to_time_t(test);
 		std::stringstream buffer;
 		buffer << std::put_time(std::localtime(&tt), "%Y-%m-%d %H:%M:%S");
@@ -240,7 +240,7 @@ void sync(asio::ip::tcp::iostream& server) {
 		bool newer_version = false;
 		for (auto& file : dirs)
 		{
-			if (p.path().filename() == file["filename"])
+			if (directory_entry.path().filename() == file["filename"])
 			{
 				exists_in_server = true;
 				if (buffer.str() > file["writetime"])
@@ -251,60 +251,59 @@ void sync(asio::ip::tcp::iostream& server) {
 		}
 		if (!exists_in_server || newer_version)
 		{
-			if (p.is_directory())
+			if (directory_entry.is_directory())
 			{
 				server << "mkdir" << "\r\n";
-				int name = p.path().filename().string().length();
+				int name = directory_entry.path().filename().string().length();
 				int text = _path_client.length();
-				std::string dir_path = p.path().string().substr(0, p.path().string().length() - name);
+				std::string dir_path = directory_entry.path().string().substr(0, directory_entry.path().string().length() - name);
 				std::string str_without_dir_path = dir_path.substr(text, dir_path.length());
 				std::string parent_dir = _path_server + str_without_dir_path;
 				server << parent_dir << "\r\n";
-				server << p.path().filename().string() << "\r\n";
+				server << directory_entry.path().filename().string() << "\r\n";
 				std::string response;
 				if (getline(server, response))
 				{
 				}
-				if (response_counter <= 12)
+				if (resp_ctr <= 12)
 				{
 					if (getline(server, response))
 					{
 					}
-					++response_counter;
+					++resp_ctr;
 				}
 			}
 			else {
-				std::string path = _path_client + p.path().string().substr(_path_client.length(), p.path().string().length());
+				std::string path = _path_client + directory_entry.path().string().substr(_path_client.length(), directory_entry.path().string().length());
 				server << "put" << "\r\n";
 				server << path << "\r\n";
-				server << p.file_size() << "\r\n";
-				std::shared_ptr<char> buffer(new char[p.file_size()], std::default_delete<char[]>());
-				std::ifstream input(p.path(), std::ios::binary);
-				input.read(buffer.get(), p.file_size());
-				server.write(buffer.get(), p.file_size());
+				server << directory_entry.file_size() << "\r\n";
+				std::shared_ptr<char> buffer(new char[directory_entry.file_size()], std::default_delete<char[]>());
+				std::ifstream input(directory_entry.path(), std::ios::binary);
+				input.read(buffer.get(), directory_entry.file_size());
+				server.write(buffer.get(), directory_entry.file_size());
 				std::string response;
 				if (getline(server, response))
 				{
 				}
-				if (response_counter <= 12)
+				if (resp_ctr <= 12)
 				{
 					if (getline(server, response))
 					{
 					}
-					++response_counter;
+					++resp_ctr;
 				}
 			}
 		}
 	}
 }
 
-void quit(const std::string& req, asio::ip::tcp::iostream& server) {
-	server << req << "\r\n";
+void quit(const std::string& request, asio::ip::tcp::iostream& server) {
+	server << request << "\r\n";
 }
 
 int main() {
 	try {
-		_CrtDumpMemoryLeaks();
 
 		const char* server_address{ "localhost" };
 		const char* server_port{ "12345" };
@@ -364,5 +363,6 @@ int main() {
 		std::cerr << "client: " << ex.what() << '\n';
 		return EXIT_FAILURE;
 	}
+	_CrtDumpMemoryLeaks();
 	return EXIT_SUCCESS;
 }

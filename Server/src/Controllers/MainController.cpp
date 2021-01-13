@@ -19,37 +19,37 @@ template<char delimiter>
 class WordDelimitedBy : public std::string
 {};
 
-void MainController::get_command(const std::string& command, asio::ip::tcp::iostream& client) const
+void MainController::get_commando(const std::string& commando, asio::ip::tcp::iostream& client) const
 {
-	if (command.find("info") == 0) {
+	if (commando == "info") {
 		std::string result;
 		if (getline(client, result)) {
 			result.erase(result.end() - 1);
 			client << info() << "\r\n";
 		}
 	}
-	else if (command.find("dir") == 0) {
+	else if (commando == "dir") {
 		std::string result;
 		if (getline(client, result)) {
 			result.erase(result.end() - 1);
 			client << dir(result) << "\r\n";
 		}
 	}
-	else if (command.find("get") == 0) {
+	else if (commando == "get") {
 		std::string result;
 		if (getline(client, result)) {
 			result.erase(result.end() - 1);
 			client << get(result, client) << "\r\n";
 		}
 	}
-	else if (command.find("del") == 0) {
+	else if (commando == "del") {
 		std::string result;
 		if (getline(client, result)) {
 			result.erase(result.end() - 1);
 			client << del(result) << "\r\n";
 		}
 	}
-	else if (command.find("mkdir") == 0) {
+	else if (commando == "mkdir") {
 		std::string result;
 		std::string result2;
 		if (getline(client, result)) {
@@ -60,7 +60,7 @@ void MainController::get_command(const std::string& command, asio::ip::tcp::iost
 		}
 		client << mkdir(result, result2) << "\r\n";
 	}
-	else if (command.find("ren") == 0) {
+	else if (commando == "ren") {
 		std::string result;
 		std::string result2;
 		if (getline(client, result)) {
@@ -71,7 +71,7 @@ void MainController::get_command(const std::string& command, asio::ip::tcp::iost
 		}
 		client << ren(result, result2) << "\r\n";
 	}
-	else if (command.find("put") == 0) {
+	else if (commando == "put") {
 		std::string result;
 		std::string result2;
 		if (getline(client, result)) {
@@ -87,7 +87,7 @@ void MainController::get_command(const std::string& command, asio::ip::tcp::iost
 			}
 		}
 	}
-	else if (command.find("quit") == 0)
+	else if (commando == "quit")
 	{
 		std::cerr << "will disconnect from client" << client.socket().local_endpoint() << "\r\n";
 	}
@@ -211,9 +211,9 @@ std::string MainController::put(const std::string& path, int file_size, asio::ip
 		result = result.substr(0, result.length() - file_name.length());
 		const std::shared_ptr<char> byte(new char[file_size], std::default_delete<char[]>());
 		client.read(byte.get(), file_size);
-		std::ofstream streamresult(_path + file_name, std::ios::binary);
-		streamresult.write(byte.get(), file_size);
-		streamresult.close();
+		std::ofstream basic_ofstream(_path + file_name, std::ios::binary);
+		basic_ofstream.write(byte.get(), file_size);
+		basic_ofstream.close();
 
 		return "OK! \r\n";
 	}
