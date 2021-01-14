@@ -107,18 +107,18 @@ void get(asio::ip::tcp::iostream& server) {
 			std::cout << result << "\n";
 		}
 		else {
-			const int iterations = std::stoi(result);
-			std::cout << iterations << "\n";
+			const int it = std::stoi(result);
+			std::cout << it << "\n";
 			std::string byte;
-			const std::shared_ptr<char> bytes(new char[iterations], std::default_delete<char[]>());
+			const std::shared_ptr<char> bytes(new char[it], std::default_delete<char[]>());
 
-			server.read(bytes.get(), iterations);
-			for (int i = 0; i < iterations; i++) {
+			server.read(bytes.get(), it);
+			for (int i = 0; i < it; i++) {
 				std::cout << bytes.get()[i] << "\n";
 			}
-			std::ofstream streamresult(_path_client + fs::path(request).filename().string(), std::ofstream::binary);
-			streamresult.write(bytes.get(), iterations);
-			streamresult.close();
+			std::ofstream basic_ofstream(_path_client + fs::path(request).filename().string(), std::ofstream::binary);
+			basic_ofstream.write(bytes.get(), it);
+			basic_ofstream.close();
 		}
 	}
 }
@@ -187,8 +187,8 @@ void sync(asio::ip::tcp::iostream& server) {
 	std::vector<std::map<std::string, std::string>> dirs = {};
 	if (getline(server, result))
 	{
-		int iterations = std::stoi(result);
-		for (int i = 0; i < iterations; ++i)
+		int it = std::stoi(result);
+		for (int i = 0; i < it; ++i)
 		{
 			if (getline(server, result))
 			{

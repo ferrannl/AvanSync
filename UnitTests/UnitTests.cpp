@@ -28,7 +28,7 @@ namespace UnitTests
 			if (getline(server, response)) {
 				response.erase(response.end() - 1); // remove '\r'
 			}
-			std::string res = "AvanSync Server 1.0 Ferran Hendriks";
+			const std::string res = "AvanSync Server 1.0 Ferran Hendriks";
 			Assert::AreEqual(res, response);
 
 			server << "quit" << crlf;
@@ -57,7 +57,7 @@ namespace UnitTests
 			if (getline(server, response)) {
 				response.erase(response.end() - 1); // remove '\r'
 			}
-			std::string expected = "F|rentestgood.txt|2021-01-14 00:51:01|0 ";
+			const std::string expected = "F|rentestgood.txt|2021-01-14 00:51:01|0 ";
 			Assert::AreEqual(expected, response);
 
 			server << "quit" << crlf;
@@ -83,7 +83,7 @@ namespace UnitTests
 			if (getline(server, response)) {
 				response.erase(response.end() - 1); // remove '\r'
 			}
-			std::string expected = "Error: no such file ";
+			const std::string expected = "Error: no such file ";
 			Assert::AreEqual(expected, response);
 
 			server << "quit" << crlf;
@@ -110,7 +110,7 @@ namespace UnitTests
 			if (getline(server, response)) {
 				response.erase(response.end() - 1); // remove '\r'
 			}
-			std::string expected = "Error: no such file ";
+			const std::string expected = "Error: no such file ";
 
 			Assert::AreEqual(expected, response);
 
@@ -138,7 +138,7 @@ namespace UnitTests
 			if (getline(server, response)) {
 				response.erase(response.end() - 1); // remove '\r'
 			}
-			std::string expected = "OK ";
+			const std::string expected = "OK ";
 
 			Assert::AreEqual(expected, response);
 
@@ -165,7 +165,7 @@ namespace UnitTests
 			if (getline(server, response)) {
 				response.erase(response.end() - 1); // remove '\r'
 			}
-			std::string expected = "Error: no such file or directory ";
+			const std::string expected = "Error: no such file or directory ";
 
 			Assert::AreEqual(expected, response);
 
@@ -193,7 +193,7 @@ namespace UnitTests
 			if (getline(server, response)) {
 				response.erase(response.end() - 1); // remove '\r'
 			}
-			std::string expected = "Error: no such directory ";
+			const std::string expected = "Error: no such directory ";
 
 			Assert::AreEqual(expected, response);
 
@@ -221,7 +221,7 @@ namespace UnitTests
 			if (getline(server, response)) {
 				response.erase(response.end() - 1); // remove '\r'
 			}
-			std::string expected = "OK ";
+			const std::string expected = "OK ";
 
 			Assert::AreEqual(expected, response);
 
